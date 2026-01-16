@@ -1,42 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = supabase;
 
-// DİKKAT: Alttaki URL ve KEY kısımlarını Supabase'den aldıklarınla değiştir!
-const supabase = createClient('BURAYA_URL_GELECEK', 'BURAYA_KEY_GELECEK');
+// Senin bilgilerinle dükkanı bağlıyoruz:
+const _supabase = createClient('https://acxlmoluahtrztzttzcz.supabase.co', 'sb_publishable_rLKNN_KK7bsl2E7KkT50gA_Zg0E4mM4');
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  const [products, setProducts] = React.useState([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
+    async function fetchProducts() {
+      const { data, error } = await _supabase.from('products').select('*');
+      if (error) console.error("Hata:", error);
+      else setProducts(data || []);
+    }
     fetchProducts();
   }, []);
-
-  async function fetchProducts() {
-    const { data } = await supabase.from('products').select('*');
-    setProducts(data || []);
-  }
 
   return (
     <div style={{ fontFamily: 'sans-serif', backgroundColor: '#f4f4f4', minHeight: '100vh' }}>
       <header style={{ backgroundColor: '#003366', color: '#b38e44', padding: '20px', textAlign: 'center', borderBottom: '4px solid #b38e44' }}>
-        <h1 style={{ margin: 0 }}>İHTİSAS GIDA</h1>
-        <p style={{ margin: 0, color: 'white' }}>Endüstriyel Tedarik Uzmanı</p>
+        <h1 style={{ margin: 0, fontSize: '28px' }}>İHTİSAS GIDA</h1>
+        <p style={{ margin: 0, color: 'white' }}>TOPTAN GIDA TEDARİK MERKEZİ</p>
       </header>
 
-      <div style={{ padding: '20px' }}>
-        {products.map(p => (
-          <div key={p.id} style={{ backgroundColor: 'white', marginBottom: '10px', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ddd' }}>
-            <div>
-              <h3 style={{ margin: 0 }}>{p.name}</h3>
-              <p style={{ margin: '5px 0', color: '#666' }}>{p.unit} - <span style={{ fontWeight: 'bold', color: '#003366' }}>{p.price} TL</span></p>
+      <div style={{ padding: '15px', maxWidth: '600px', margin: '0 auto' }}>
+        {products.length === 0 ? (
+          <p style={{ textAlign: 'center', marginTop: '50px', color: '#666' }}>Ürünler yükleniyor veya henüz eklenmedi...</p>
+        ) : (
+          products.map(p => (
+            <div key={p.id} style={{ backgroundColor: 'white', marginBottom: '12px', padding: '15px', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', borderLeft: '6px solid #b38e44' }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#333' }}>{p.name}</h3>
+                <p style={{ margin: '4px 0 0 0', color: '#888', fontSize: '14px' }}>Birim: {p.unit || 'Adet'}</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#003366' }}>{p.price} TL</span>
+              </div>
             </div>
-            <button style={{ backgroundColor: '#003366', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px' }}>Ekle</button>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
 }
 
-export default App;
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
