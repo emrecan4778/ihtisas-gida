@@ -3,49 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İHTİSAS GIDA</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <title>İHTİSAS GIDA - Toptan Market</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: sans-serif; margin: 0; background: #f4f4f4; }
-        .header { background: #003366; color: #d4af37; padding: 20px; text-align: center; border-bottom: 4px solid #d4af37; }
-        .product { background: white; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     <div id="root"></div>
+
     <script type="text/babel">
-        const { createClient } = supabase;
-        // SENİN ANAHTARLARIN BURADA:
-        const _supabase = createClient('https://acxlmoluahtrztzttzcz.supabase.co', 'sb_publishable_rLKNN_KK7bsl2E7KkT50gA_Zg0E4mM4');
+        const { useState, useEffect } = React;
+
+        // Supabase config - KENDİ BİLGİLERİNİZİ YAPIN
+        const SUPABASE_URL = 'https://acxlmoluahtrztzttzcz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjeGxtb2x1YWh0cnp0enR0emN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MjM1MzgsImV4cCI6MjA4NDA5OTUzOH0.JGdB9MvCPJFkfPZSR00-ngSxZFO4XzYULPOWLd1U9Q0';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         function App() {
-            const [items, setItems] = React.useState([]);
-            React.useEffect(() => {
-                async function load() {
-                    const { data } = await _supabase.from('products').select('*');
-                    setItems(data || []);
-                }
-                load();
+            const [products, setProducts] = useState([]);
+            const [categories, setCategories] = useState([]);
+            const [selectedCategory, setSelectedCategory] = useState('Tümü');
+            const [cart, setCart] = useState([]);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [showCart, setShowCart] = useState(false);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                loadProducts();
             }, []);
-            return (
-                <div>
-                    <div className="header"><h1>İHTİSAS GIDA</h1><p>Hoş Geldiniz</p></div>
-                    <div style={{padding: '10px'}}>
-                        {items.length === 0 ? <p>Yükleniyor...</p> : items.map(i => (
-                            <div key={i.id} className="product">
-                                <span><strong>{i.name}</strong></span>
-                                <span style={{color: '#003366', fontWeight: 'bold'}}>{i.price} TL</span>
-                            </div>
-                        ))}
+
+            const loadProducts = async () => {
+                try {
+                    const { data, error } = await supabase.from('products').select('*');
+                    if (error) throw error;
+                    
+                    setProducts(data || []);
+                    const cats = ['Tümü', ...new Set(data.map(p => p.category))];
+                    setCategories(cats);
+                    setLoading(false);
+                } catch (err) {
+                    console.error('Hata:', err);
+                    setLoading(false);
+                }
+            };
+
+            const addToCart = (product) => {
+                const existing = cart.find(item => item.id === product.id);
+                if (existing) {
+                    setCart(cart.map(item => 
+                        item.id === product.id 
+                            ? { ...item, quantity: item.quantity + 1 }
+                            : item
+                    ));
+                } else {
+                    setCart([...cart, { ...product, quantity: 1 }]);
+                }
+            };
+
+            const removeFromCart = (productId) => {
+                setCart(cart.filter(item => item.id !== productId));
+            };
+
+            const updateQuantity = (productId, newQuantity) => {
+                if (newQuantity === 0) {
+                    removeFromCart(productId);
+                } else {
+                    setCart(cart.map(item =>
+                        item.id === productId ? { ...item, quantity: newQuantity } : item
+                    ));
+                }
+            };
+
+            const sendWhatsAppOrder = () => {
+                let message = '🛒 *İHTİSAS GIDA SİPARİŞİ*\n\n';
+                cart.forEach(item => {
+                    message += `• ${item.name}\n  ${item.quantity} adet x ${item.price}₺ = ${(item.quantity * item.price).toFixed(2)}₺\n\n`;
+                });
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                message += `*TOPLAM: ${total.toFixed(2)}₺*`;
+                
+                const phone = '905303538635'; // TELEFON NUMARANIZI YAZIN
+                const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                window.open(url, '_blank');
+            };
+
+            const filteredProducts = products.filter(p => {
+                const matchCategory = selectedCategory === 'Tümü' || p.category === selectedCategory;
+                const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchCategory && matchSearch;
+            });
+
+            const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            if (loading) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-900 mx-auto mb-4"></div>
+                            <p className="text-gray-600">Ürünler yükleniyor...</p>
+                        </div>
                     </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-blue-900 to-blue-800 text-white sticky top-0 z-50 shadow-lg">
+                        <div className="container mx-auto px-4 py-4">
+                            <div className="flex items-center justify-between">
+                                <h1 className="text-2xl font-bold">İHTİSAS GIDA</h1>
+                                <button 
+                                    onClick={() => setShowCart(!showCart)}
+                                    className="relative bg-yellow-500 text-blue-900 px-4 py-2 rounded-full font-semibold hover:bg-yellow-400 transition"
+                                >
+                                    🛒 Sepet
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </button>
+                            </div>
+                            
+                            {/* Search */}
+                            <div className="mt-4">
+                                <input
+                                    type="text"
+                                    placeholder="🔍 Ürün ara..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                />
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Categories */}
+                    <div className="bg-white border-b sticky top-[136px] z-40 shadow-sm">
+                        <div className="container mx-auto px-4 py-3 overflow-x-auto">
+                            <div className="flex gap-2 min-w-max">
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setSelectedCategory(cat)}
+                                        className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition ${
+                                            selectedCategory === cat
+                                                ? 'bg-blue-900 text-white'
+                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Products */}
+                    <div className="container mx-auto px-4 py-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {filteredProducts.map(product => (
+                                <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
+                                    <div className="p-4">
+                                        <div className="bg-gray-100 rounded-lg h-32 flex items-center justify-center mb-3">
+                                            <span className="text-4xl">📦</span>
+                                        </div>
+                                        <h3 className="font-semibold text-sm mb-2 h-10 overflow-hidden">{product.name}</h3>
+                                        <p className="text-xs text-gray-500 mb-3">{product.category}</p>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-lg font-bold text-blue-900">{product.price}₺</span>
+                                            <button
+                                                onClick={() => addToCart(product)}
+                                                className="bg-yellow-500 hover:bg-yellow-600 text-blue-900 px-3 py-1 rounded-full text-sm font-semibold transition"
+                                            >
+                                                Ekle
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {filteredProducts.length === 0 && (
+                            <div className="text-center py-12">
+                                <p className="text-gray-500 text-lg">Ürün bulunamadı</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Cart Sidebar */}
+                    {showCart && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={() => setShowCart(false)}>
+                            <div 
+                                className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl overflow-y-auto"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="sticky top-0 bg-blue-900 text-white p-4 flex justify-between items-center">
+                                    <h2 className="text-xl font-bold">Sepetim</h2>
+                                    <button onClick={() => setShowCart(false)} className="text-2xl">×</button>
+                                </div>
+
+                                {cart.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <div className="text-6xl mb-4">🛒</div>
+                                        <p className="text-gray-500">Sepetiniz boş</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="p-4 space-y-4">
+                                            {cart.map(item => (
+                                                <div key={item.id} className="bg-gray-50 p-4 rounded-lg">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <h3 className="font-semibold text-sm flex-1">{item.name}</h3>
+                                                        <button
+                                                            onClick={() => removeFromCart(item.id)}
+                                                            className="text-red-500 text-xl ml-2"
+                                                        >
+                                                            🗑️
+                                                        </button>
+                                                    </div>
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                                className="bg-gray-300 hover:bg-gray-400 w-8 h-8 rounded-full font-bold"
+                                                            >
+                                                                -
+                                                            </button>
+                                                            <span className="font-bold w-8 text-center">{item.quantity}</span>
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                                className="bg-blue-900 hover:bg-blue-800 text-white w-8 h-8 rounded-full font-bold"
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                        <span className="font-bold text-blue-900">
+                                                            {(item.price * item.quantity).toFixed(2)}₺
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="sticky bottom-0 bg-white border-t p-4 space-y-3">
+                                            <div className="flex justify-between items-center text-xl font-bold">
+                                                <span>Toplam:</span>
+                                                <span className="text-blue-900">{cartTotal.toFixed(2)}₺</span>
+                                            </div>
+                                            <button
+                                                onClick={sendWhatsAppOrder}
+                                                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition flex items-center justify-center gap-2"
+                                            >
+                                                <span>📱</span>
+                                                WhatsApp ile Sipariş Ver
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Floating Cart Button (Mobile) */}
+                    {!showCart && cartCount > 0 && (
+                        <button
+                            onClick={() => setShowCart(true)}
+                            className="fixed bottom-6 right-6 bg-yellow-500 text-blue-900 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl hover:bg-yellow-400 transition z-40"
+                        >
+                            🛒
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
+                                {cartCount}
+                            </span>
+                        </button>
+                    )}
                 </div>
             );
         }
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
