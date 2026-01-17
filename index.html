@@ -2,13 +2,24 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İHTİSAS GIDA - Toptan Market</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>İHTİSAS GIDA</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            max-width: 428px; 
+            margin: 0 auto; 
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+        * { -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -16,18 +27,18 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Supabase config - KENDİ BİLGİLERİNİZİ YAPIN
+        // SUPABASE AYARLARI - KENDİ BİLGİLERİNİZİ YAZIN
         const SUPABASE_URL = 'https://acxlmoluahtrztzttzcz.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjeGxtb2x1YWh0cnp0enR0emN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MjM1MzgsImV4cCI6MjA4NDA5OTUzOH0.JGdB9MvCPJFkfPZSR00-ngSxZFO4XzYULPOWLd1U9Q0';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         function App() {
+            const [currentTab, setCurrentTab] = useState('home');
             const [products, setProducts] = useState([]);
             const [categories, setCategories] = useState([]);
             const [selectedCategory, setSelectedCategory] = useState('Tümü');
             const [cart, setCart] = useState([]);
             const [searchQuery, setSearchQuery] = useState('');
-            const [showCart, setShowCart] = useState(false);
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
@@ -98,87 +109,137 @@
             const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-            if (loading) {
-                return (
-                    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                        <div className="text-center">
-                            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-900 mx-auto mb-4"></div>
-                            <p className="text-gray-600">Ürünler yükleniyor...</p>
-                        </div>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="min-h-screen bg-gray-50">
+            // ANA SAYFA
+            const HomePage = () => (
+                <div className="pb-20 bg-gray-50">
                     {/* Header */}
-                    <header className="bg-gradient-to-r from-blue-900 to-blue-800 text-white sticky top-0 z-50 shadow-lg">
-                        <div className="container mx-auto px-4 py-4">
-                            <div className="flex items-center justify-between">
-                                <h1 className="text-2xl font-bold">İHTİSAS GIDA</h1>
-                                <button 
-                                    onClick={() => setShowCart(!showCart)}
-                                    className="relative bg-yellow-500 text-blue-900 px-4 py-2 rounded-full font-semibold hover:bg-yellow-400 transition"
-                                >
-                                    🛒 Sepet
-                                    {cartCount > 0 && (
-                                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
-                                            {cartCount}
-                                        </span>
-                                    )}
-                                </button>
-                            </div>
-                            
-                            {/* Search */}
-                            <div className="mt-4">
-                                <input
-                                    type="text"
-                                    placeholder="🔍 Ürün ara..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                />
-                            </div>
-                        </div>
-                    </header>
+                    <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 sticky top-0 z-10">
+                        <h1 className="text-xl font-bold mb-3">İHTİSAS GIDA</h1>
+                        <input
+                            type="text"
+                            placeholder="🔍 Ürün, kategori veya marka ara..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full px-4 py-2 rounded-lg text-gray-800 text-sm"
+                        />
+                    </div>
 
-                    {/* Categories */}
-                    <div className="bg-white border-b sticky top-[136px] z-40 shadow-sm">
-                        <div className="container mx-auto px-4 py-3 overflow-x-auto">
-                            <div className="flex gap-2 min-w-max">
-                                {categories.map(cat => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition ${
-                                            selectedCategory === cat
-                                                ? 'bg-blue-900 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
-                            </div>
+                    {/* Hızlı Aksiyonlar */}
+                    <div className="bg-white p-4 grid grid-cols-2 gap-3 mb-2">
+                        <button 
+                            onClick={() => setCurrentTab('qr')}
+                            className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-xl flex flex-col items-center gap-2"
+                        >
+                            <span className="text-3xl">📱</span>
+                            <span className="text-sm font-semibold">QR Kodu</span>
+                        </button>
+                        <button 
+                            onClick={() => setCurrentTab('tikla-gel-al')}
+                            className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-xl flex flex-col items-center gap-2"
+                        >
+                            <span className="text-3xl">🛍️</span>
+                            <span className="text-sm font-semibold">Tıkla Gel Al</span>
+                        </button>
+                    </div>
+
+                    {/* Kategoriler */}
+                    <div className="bg-white p-4 mb-2">
+                        <h2 className="font-bold mb-3">Kategoriler</h2>
+                        <div className="grid grid-cols-3 gap-3">
+                            {categories.slice(1, 7).map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => {
+                                        setSelectedCategory(cat);
+                                        setCurrentTab('categories');
+                                    }}
+                                    className="bg-gray-100 p-4 rounded-xl text-center"
+                                >
+                                    <div className="text-3xl mb-1">📦</div>
+                                    <div className="text-xs font-medium text-gray-700">{cat}</div>
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Products */}
-                    <div className="container mx-auto px-4 py-6">
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {filteredProducts.map(product => (
-                                <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-                                    <div className="p-4">
-                                        <div className="bg-gray-100 rounded-lg h-32 flex items-center justify-center mb-3">
-                                            <span className="text-4xl">📦</span>
-                                        </div>
-                                        <h3 className="font-semibold text-sm mb-2 h-10 overflow-hidden">{product.name}</h3>
-                                        <p className="text-xs text-gray-500 mb-3">{product.category}</p>
+                    {/* Öne Çıkan Ürünler */}
+                    <div className="bg-white p-4">
+                        <h2 className="font-bold mb-3">Öne Çıkan Ürünler</h2>
+                        <div className="grid grid-cols-2 gap-3">
+                            {products.slice(0, 6).map(product => (
+                                <div key={product.id} className="border rounded-xl overflow-hidden">
+                                    <div className="bg-gray-100 h-32 flex items-center justify-center">
+                                        <span className="text-4xl">📦</span>
+                                    </div>
+                                    <div className="p-3">
+                                        <h3 className="text-xs font-semibold mb-1 h-8 overflow-hidden">{product.name}</h3>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-lg font-bold text-blue-900">{product.price}₺</span>
+                                            <span className="font-bold text-blue-900">{product.price}₺</span>
                                             <button
                                                 onClick={() => addToCart(product)}
-                                                className="bg-yellow-500 hover:bg-yellow-600 text-blue-900 px-3 py-1 rounded-full text-sm font-semibold transition"
+                                                className="bg-yellow-500 text-blue-900 text-xs px-3 py-1 rounded-full font-bold"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // KATEGORİLER SAYFASI
+            const CategoriesPage = () => (
+                <div className="pb-20 bg-gray-50">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 sticky top-0 z-10">
+                        <h1 className="text-xl font-bold mb-3">Kategoriler</h1>
+                        <input
+                            type="text"
+                            placeholder="🔍 Ürün ara..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full px-4 py-2 rounded-lg text-gray-800 text-sm"
+                        />
+                    </div>
+
+                    {/* Kategori Seçimi */}
+                    <div className="bg-white p-3 overflow-x-auto hide-scrollbar sticky top-[100px] z-10">
+                        <div className="flex gap-2">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium ${
+                                        selectedCategory === cat
+                                            ? 'bg-blue-900 text-white'
+                                            : 'bg-gray-100 text-gray-700'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Ürünler */}
+                    <div className="p-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            {filteredProducts.map(product => (
+                                <div key={product.id} className="bg-white border rounded-xl overflow-hidden">
+                                    <div className="bg-gray-100 h-32 flex items-center justify-center">
+                                        <span className="text-4xl">📦</span>
+                                    </div>
+                                    <div className="p-3">
+                                        <h3 className="text-xs font-semibold mb-1 h-8 overflow-hidden">{product.name}</h3>
+                                        <p className="text-xs text-gray-500 mb-2">{product.category}</p>
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-bold text-blue-900">{product.price}₺</span>
+                                            <button
+                                                onClick={() => addToCart(product)}
+                                                className="bg-yellow-500 text-blue-900 text-xs px-3 py-1 rounded-full font-bold"
                                             >
                                                 Ekle
                                             </button>
@@ -187,100 +248,290 @@
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </div>
+            );
 
-                        {filteredProducts.length === 0 && (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500 text-lg">Ürün bulunamadı</p>
-                            </div>
-                        )}
+            // SEPET SAYFASI
+            const CartPage = () => (
+                <div className="pb-20 bg-gray-50 min-h-screen">
+                    <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4">
+                        <h1 className="text-xl font-bold">Sepetim</h1>
                     </div>
 
-                    {/* Cart Sidebar */}
-                    {showCart && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={() => setShowCart(false)}>
-                            <div 
-                                className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl overflow-y-auto"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <div className="sticky top-0 bg-blue-900 text-white p-4 flex justify-between items-center">
-                                    <h2 className="text-xl font-bold">Sepetim</h2>
-                                    <button onClick={() => setShowCart(false)} className="text-2xl">×</button>
-                                </div>
-
-                                {cart.length === 0 ? (
-                                    <div className="p-8 text-center">
-                                        <div className="text-6xl mb-4">🛒</div>
-                                        <p className="text-gray-500">Sepetiniz boş</p>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="p-4 space-y-4">
-                                            {cart.map(item => (
-                                                <div key={item.id} className="bg-gray-50 p-4 rounded-lg">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <h3 className="font-semibold text-sm flex-1">{item.name}</h3>
+                    {cart.length === 0 ? (
+                        <div className="text-center py-20">
+                            <div className="text-6xl mb-4">🛒</div>
+                            <p className="text-gray-500">Sepetiniz boş</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="p-4 space-y-3">
+                                {cart.map(item => (
+                                    <div key={item.id} className="bg-white p-4 rounded-xl">
+                                        <div className="flex items-start gap-3">
+                                            <div className="bg-gray-100 w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                <span className="text-2xl">📦</span>
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="font-semibold text-sm mb-1">{item.name}</h3>
+                                                <p className="text-xs text-gray-500 mb-2">{item.category}</p>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
                                                         <button
-                                                            onClick={() => removeFromCart(item.id)}
-                                                            className="text-red-500 text-xl ml-2"
+                                                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                            className="w-7 h-7 bg-gray-200 rounded-full font-bold text-sm"
                                                         >
-                                                            🗑️
+                                                            -
+                                                        </button>
+                                                        <span className="font-bold w-6 text-center">{item.quantity}</span>
+                                                        <button
+                                                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                            className="w-7 h-7 bg-blue-900 text-white rounded-full font-bold text-sm"
+                                                        >
+                                                            +
                                                         </button>
                                                     </div>
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-2">
-                                                            <button
-                                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                                className="bg-gray-300 hover:bg-gray-400 w-8 h-8 rounded-full font-bold"
-                                                            >
-                                                                -
-                                                            </button>
-                                                            <span className="font-bold w-8 text-center">{item.quantity}</span>
-                                                            <button
-                                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                className="bg-blue-900 hover:bg-blue-800 text-white w-8 h-8 rounded-full font-bold"
-                                                            >
-                                                                +
-                                                            </button>
-                                                        </div>
-                                                        <span className="font-bold text-blue-900">
-                                                            {(item.price * item.quantity).toFixed(2)}₺
-                                                        </span>
-                                                    </div>
+                                                    <span className="font-bold text-blue-900">{(item.price * item.quantity).toFixed(2)}₺</span>
                                                 </div>
-                                            ))}
-                                        </div>
-
-                                        <div className="sticky bottom-0 bg-white border-t p-4 space-y-3">
-                                            <div className="flex justify-between items-center text-xl font-bold">
-                                                <span>Toplam:</span>
-                                                <span className="text-blue-900">{cartTotal.toFixed(2)}₺</span>
                                             </div>
                                             <button
-                                                onClick={sendWhatsAppOrder}
-                                                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition flex items-center justify-center gap-2"
+                                                onClick={() => removeFromCart(item.id)}
+                                                className="text-red-500 text-xl"
                                             >
-                                                <span>📱</span>
-                                                WhatsApp ile Sipariş Ver
+                                                ×
                                             </button>
                                         </div>
-                                    </>
-                                )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="fixed bottom-16 left-0 right-0 bg-white border-t p-4 shadow-lg" style={{maxWidth: '428px', margin: '0 auto'}}>
+                                <div className="flex justify-between items-center mb-3">
+                                    <span className="font-semibold">Toplam:</span>
+                                    <span className="text-2xl font-bold text-blue-900">{cartTotal.toFixed(2)}₺</span>
+                                </div>
+                                <button
+                                    onClick={sendWhatsAppOrder}
+                                    className="w-full bg-green-500 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"
+                                >
+                                    <span>📱</span>
+                                    WhatsApp ile Sipariş Ver
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+
+            // HESABIM SAYFASI
+            const AccountPage = () => (
+                <div className="pb-20 bg-gray-50 min-h-screen">
+                    <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 text-center">
+                        <div className="w-20 h-20 bg-white rounded-full mx-auto mb-3 flex items-center justify-center text-3xl">
+                            👤
+                        </div>
+                        <h2 className="font-bold">Hoş Geldiniz</h2>
+                        <p className="text-sm text-blue-200">Giriş yapın veya kayıt olun</p>
+                    </div>
+
+                    <div className="p-4 space-y-2">
+                        <button className="w-full bg-white p-4 rounded-xl flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">📋</span>
+                                <span className="font-medium">Siparişlerim</span>
+                            </div>
+                            <span className="text-gray-400">›</span>
+                        </button>
+                        <button 
+                            onClick={() => setCurrentTab('qr')}
+                            className="w-full bg-white p-4 rounded-xl flex items-center justify-between"
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">📱</span>
+                                <span className="font-medium">QR Kodum</span>
+                            </div>
+                            <span className="text-gray-400">›</span>
+                        </button>
+                        <button className="w-full bg-white p-4 rounded-xl flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">🏪</span>
+                                <span className="font-medium">Mağazalar</span>
+                            </div>
+                            <span className="text-gray-400">›</span>
+                        </button>
+                        <button className="w-full bg-white p-4 rounded-xl flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">💳</span>
+                                <span className="font-medium">Ödeme Bilgilerim</span>
+                            </div>
+                            <span className="text-gray-400">›</span>
+                        </button>
+                        <button className="w-full bg-white p-4 rounded-xl flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">⚙️</span>
+                                <span className="font-medium">Ayarlar</span>
+                            </div>
+                            <span className="text-gray-400">›</span>
+                        </button>
+                        <button className="w-full bg-white p-4 rounded-xl flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">❓</span>
+                                <span className="font-medium">Yardım</span>
+                            </div>
+                            <span className="text-gray-400">›</span>
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // QR KOD SAYFASI
+            const QRPage = () => (
+                <div className="pb-20 bg-gray-50 min-h-screen">
+                    <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4">
+                        <h1 className="text-xl font-bold">QR Kodum</h1>
+                    </div>
+
+                    <div className="p-6 text-center">
+                        <p className="text-gray-600 mb-6">Kasada göstererek hızlıca alışveriş yapın</p>
+                        
+                        <div className="bg-white p-8 rounded-2xl shadow-lg inline-block mb-6">
+                            <div className="w-64 h-64 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center">
+                                <span className="text-8xl">📱</span>
                             </div>
                         </div>
-                    )}
 
-                    {/* Floating Cart Button (Mobile) */}
-                    {!showCart && cartCount > 0 && (
-                        <button
-                            onClick={() => setShowCart(true)}
-                            className="fixed bottom-6 right-6 bg-yellow-500 text-blue-900 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl hover:bg-yellow-400 transition z-40"
+                        <div className="bg-blue-50 p-4 rounded-xl">
+                            <p className="text-sm text-gray-600 mb-1">Üye No</p>
+                            <p className="font-mono text-xl font-bold text-blue-900">IG-2025-001</p>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // TIKLA GEL AL SAYFASI
+            const TiklaGelAlPage = () => (
+                <div className="pb-20 bg-gray-50 min-h-screen">
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4">
+                        <h1 className="text-xl font-bold">Tıkla Gel Al</h1>
+                        <p className="text-sm text-orange-100 mt-1">Sipariş ver, mağazadan teslim al</p>
+                    </div>
+
+                    <div className="p-4">
+                        <div className="bg-white p-6 rounded-xl text-center mb-4">
+                            <div className="text-6xl mb-4">🛍️</div>
+                            <h2 className="font-bold text-lg mb-2">Hızlı ve Pratik</h2>
+                            <p className="text-sm text-gray-600">Online sipariş ver, dilediğin zamanda mağazadan teslim al</p>
+                        </div>
+
+                        <div className="bg-white p-4 rounded-xl space-y-3">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 text-orange-600 font-bold">1</div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Ürünleri Seç</h3>
+                                    <p className="text-sm text-gray-600">Sepetine ekle</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 text-orange-600 font-bold">2</div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Mağaza Seç</h3>
+                                    <p className="text-sm text-gray-600">Teslimat saatini belirle</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 text-orange-600 font-bold">3</div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Teslim Al</h3>
+                                    <p className="text-sm text-gray-600">Belirlediğin saatte mağazadan al</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={() => setCurrentTab('categories')}
+                            className="w-full bg-orange-500 text-white py-4 rounded-xl font-bold mt-4"
                         >
-                            🛒
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
-                                {cartCount}
-                            </span>
+                            Alışverişe Başla
                         </button>
-                    )}
+                    </div>
+                </div>
+            );
+
+            // Render Current Screen
+            const renderScreen = () => {
+                if (loading) {
+                    return (
+                        <div className="min-h-screen flex items-center justify-center">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-900 mx-auto mb-3"></div>
+                                <p className="text-gray-600">Yükleniyor...</p>
+                            </div>
+                        </div>
+                    );
+                }
+
+                switch(currentTab) {
+                    case 'home': return <HomePage />;
+                    case 'categories': return <CategoriesPage />;
+                    case 'cart': return <CartPage />;
+                    case 'account': return <AccountPage />;
+                    case 'qr': return <QRPage />;
+                    case 'tikla-gel-al': return <TiklaGelAlPage />;
+                    default: return <HomePage />;
+                }
+            };
+
+            return (
+                <div className="bg-white min-h-screen">
+                    {renderScreen()}
+
+                    {/* ALT NAVİGASYON - MOBİL APP GİBİ */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg" style={{maxWidth: '428px', margin: '0 auto'}}>
+                        <div className="grid grid-cols-4 h-16">
+                            <button
+                                onClick={() => setCurrentTab('home')}
+                                className={`flex flex-col items-center justify-center gap-1 ${
+                                    currentTab === 'home' ? 'text-blue-900' : 'text-gray-400'
+                                }`}
+                            >
+                                <span className="text-2xl">🏠</span>
+                                <span className="text-xs font-medium">Ana Sayfa</span>
+                            </button>
+                            <button
+                                onClick={() => setCurrentTab('categories')}
+                                className={`flex flex-col items-center justify-center gap-1 ${
+                                    currentTab === 'categories' ? 'text-blue-900' : 'text-gray-400'
+                                }`}
+                            >
+                                <span className="text-2xl">🏷️</span>
+                                <span className="text-xs font-medium">Kategoriler</span>
+                            </button>
+                            <button
+                                onClick={() => setCurrentTab('cart')}
+                                className={`flex flex-col items-center justify-center gap-1 relative ${
+                                    currentTab === 'cart' ? 'text-blue-900' : 'text-gray-400'
+                                }`}
+                            >
+                                {cartCount > 0 && (
+                                    <span className="absolute top-1 right-6 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                                        {cartCount}
+                                    </span>
+                                )}
+                                <span className="text-2xl">🛒</span>
+                                <span className="text-xs font-medium">Sepetim</span>
+                            </button>
+                            <button
+                                onClick={() => setCurrentTab('account')}
+                                className={`flex flex-col items-center justify-center gap-1 ${
+                                    currentTab === 'account' ? 'text-blue-900' : 'text-gray-400'
+                                }`}
+                            >
+                                <span className="text-2xl">👤</span>
+                                <span className="text-xs font-medium">Hesabım</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             );
         }
