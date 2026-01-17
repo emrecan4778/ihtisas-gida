@@ -3,68 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İHTİSAS GIDA | Toptan Gıda Merkezi</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <title>İHTİSAS GIDA</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; margin: 0; }
-        header { background: #003366; color: #d4af37; padding: 20px; text-align: center; border-bottom: 5px solid #d4af37; }
-        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #d4af37; }
-        .price { font-size: 1.4em; font-weight: bold; color: #003366; }
-        .btn { background: #003366; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        body { font-family: sans-serif; margin: 0; background: #f4f4f4; }
+        .header { background: #003366; color: #d4af37; padding: 20px; text-align: center; border-bottom: 4px solid #d4af37; }
+        .product { background: white; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { createClient } = supabase;
+        // SENİN ANAHTARLARIN BURADA:
+        const _supabase = createClient('https://acxlmoluahtrztzttzcz.supabase.co', 'sb_publishable_rLKNN_KK7bsl2E7KkT50gA_Zg0E4mM4');
 
-<div id="root"></div>
-
-<script type="text/babel">
-    const { createClient } = supabase;
-
-const _supabase = createClient('https://acxlmoluahtrztzttzcz.supabase.co', 'sb_publishable_rLKNN_KK7bsl2E7KkT50gA_Zg0E4mM4');
-
-    function App() {
-        const [products, setProducts] = React.useState([]);
-
-        React.useEffect(() => {
-            getProducts();
-        }, []);
-
-        async function getProducts() {
-            const { data, error } = await _supabase.from('products').select('*');
-            if (data) setProducts(data);
-        }
-
-        return (
-            <div>
-                <header>
-                    <h1 style={{margin:0}}>İHTİSAS GIDA</h1>
-                    <p style={{margin:0, opacity:0.9}}>Profesyonel Tedarik Çözümleri</p>
-                </header>
-                <div className="container">
-                    {products.length === 0 ? <p style={{textAlign:'center'}}>Ürünler yükleniyor...</p> : 
-                     products.map(p => (
-                        <div key={p.id} className="card">
-                            <div>
-                                <h3 style={{margin:0}}>{p.name}</h3>
-                                <small style={{color:'#666'}}>{p.unit || 'Adet'}</small>
+        function App() {
+            const [items, setItems] = React.useState([]);
+            React.useEffect(() => {
+                async function load() {
+                    const { data } = await _supabase.from('products').select('*');
+                    setItems(data || []);
+                }
+                load();
+            }, []);
+            return (
+                <div>
+                    <div className="header"><h1>İHTİSAS GIDA</h1><p>Hoş Geldiniz</p></div>
+                    <div style={{padding: '10px'}}>
+                        {items.length === 0 ? <p>Yükleniyor...</p> : items.map(i => (
+                            <div key={i.id} className="product">
+                                <span><strong>{i.name}</strong></span>
+                                <span style={{color: '#003366', fontWeight: 'bold'}}>{i.price} TL</span>
                             </div>
-                            <div style={{textAlign:'right'}}>
-                                <div className="price">{p.price} ₺</div>
-                                <button className="btn">Sepete Ekle</button>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
-        );
-    }
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-</script>
-
+            );
+        }
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
