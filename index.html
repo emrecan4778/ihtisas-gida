@@ -9,8 +9,8 @@
   <style>
     html, body { height: 100%; }
     body { -webkit-tap-highlight-color: transparent; }
-    .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 84px); }
-    .tabbar { padding-bottom: env(safe-area-inset-bottom); }
+    .no-scrollbar::-webkit-scrollbar { display:none; }
+    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
     .line-clamp-2{
       display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
     }
@@ -19,31 +19,32 @@
 
 <body class="bg-gray-100 text-gray-900">
   <!-- Top App Bar -->
-  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b">
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b">
     <div class="px-4 pt-4 pb-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <div class="h-10 w-10 rounded-2xl bg-red-600 grid place-items-center text-white font-bold">İG</div>
+          <div class="h-9 w-9 rounded-xl bg-red-600 grid place-items-center text-white font-bold">İG</div>
           <div class="leading-tight">
             <div class="font-semibold">İhtisas Gıda</div>
-            <div class="text-xs text-gray-500">B2B Toptan</div>
+            <div class="text-xs text-gray-500">B2B Toptan Market</div>
           </div>
         </div>
-
-        <button id="searchOpen" class="h-10 px-3 rounded-2xl bg-gray-100 text-sm font-medium">🔍 Ara</button>
+        <button id="openCartTop" class="h-10 px-3 rounded-xl bg-gray-100 text-sm font-medium">
+          🛒 <span id="cartCountTop" class="tabular-nums">0</span>
+        </button>
       </div>
 
       <!-- Search -->
-      <div id="searchWrap" class="mt-3 hidden">
+      <div class="mt-3">
         <div class="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-2">
           <span class="text-gray-500">🔎</span>
-          <input id="q" class="w-full bg-transparent outline-none text-sm" placeholder="Ürün ara (ör: 18L, ayçiçek, salça, 25kg)" />
+          <input id="q" class="w-full bg-transparent outline-none text-sm" placeholder="Ürün ara (ör: 18L, salça, koli, deterjan)" />
           <button id="clearBtn" class="text-xs text-gray-500 hidden">Temizle</button>
         </div>
       </div>
 
       <!-- Category chips -->
-      <div class="mt-3 -mx-1 flex gap-2 overflow-x-auto pb-1">
+      <div class="mt-3 -mx-1 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
         <button class="chip px-4 py-2 rounded-full text-sm font-medium bg-red-600 text-white" data-cat="Tümü">Tümü</button>
         <button class="chip px-4 py-2 rounded-full text-sm font-medium bg-gray-100" data-cat="Yağlar">Yağlar</button>
         <button class="chip px-4 py-2 rounded-full text-sm font-medium bg-gray-100" data-cat="Bakliyat">Bakliyat</button>
@@ -55,202 +56,56 @@
     </div>
   </header>
 
-  <!-- Views -->
-  <main class="safe-bottom">
-    <!-- HOME -->
-    <section id="view-home" class="px-4 pt-4">
-      <!-- Banner carousel -->
-      <div class="rounded-3xl overflow-hidden shadow bg-white border">
-        <div id="banner" class="p-4 bg-red-600 text-white">
-          <div class="text-sm opacity-90" id="bannerKicker">Haftanın Fırsatları</div>
-          <div class="text-xl font-semibold mt-1" id="bannerTitle">Ev Dışı Tüketim Ürün Gamı</div>
-          <div class="mt-2 flex flex-wrap gap-2" id="bannerTags">
-            <span class="px-3 py-1 rounded-full bg-white/15 text-xs">18 L Yağlar</span>
-            <span class="px-3 py-1 rounded-full bg-white/15 text-xs">5 Kg Soslar</span>
-            <span class="px-3 py-1 rounded-full bg-white/15 text-xs">25 Kg Bakliyat</span>
-          </div>
-        </div>
-        <div class="flex items-center justify-between px-4 py-3 bg-white">
-          <div class="text-xs text-gray-500">Kampanyalar</div>
-          <div class="flex gap-2">
-            <button id="bannerPrev" class="h-9 w-9 rounded-2xl bg-gray-100 grid place-items-center">‹</button>
-            <button id="bannerNext" class="h-9 w-9 rounded-2xl bg-gray-100 grid place-items-center">›</button>
-          </div>
+  <!-- Banners / Sliders (simple) -->
+  <section class="px-4 pt-4">
+    <div class="grid gap-3">
+      <div class="rounded-2xl bg-red-600 text-white p-4 shadow">
+        <div class="text-sm opacity-90">Ev Dışı Tüketim</div>
+        <div class="text-lg font-semibold">18 L yağlar • Koli ürünler • Toptan avantaj</div>
+        <div class="mt-2 flex gap-2 flex-wrap">
+          <span class="px-3 py-1 rounded-full bg-white/15 text-xs">HORECA</span>
+          <span class="px-3 py-1 rounded-full bg-white/15 text-xs">Toplu alım</span>
+          <span class="px-3 py-1 rounded-full bg-white/15 text-xs">Hızlı sevkiyat</span>
         </div>
       </div>
 
-      <!-- Meta + sort -->
-      <div class="flex items-center justify-between mt-4 mb-3">
+      <div class="rounded-2xl bg-white border shadow-sm p-4 flex items-center justify-between">
         <div>
-          <div class="font-semibold">Ürünler</div>
-          <div id="meta" class="text-xs text-gray-500">Yükleniyor…</div>
+          <div class="text-sm text-gray-500">Öne Çıkanlar</div>
+          <div class="font-semibold">Yağ • Salça • Şeker • Un</div>
         </div>
-        <button id="sortBtn" class="text-sm font-medium px-3 py-2 rounded-2xl bg-white border">Sırala: Önerilen</button>
+        <button id="gotoFeatured" class="px-3 py-2 rounded-xl bg-gray-100 text-sm font-medium">Görüntüle</button>
       </div>
+    </div>
+  </section>
 
-      <div id="grid" class="grid grid-cols-2 gap-3 md:grid-cols-4"></div>
-    </section>
-
-    <!-- CATEGORIES (simple) -->
-    <section id="view-categories" class="hidden px-4 pt-4">
-      <div class="font-semibold text-lg mb-3">Kategoriler</div>
-      <div class="grid grid-cols-2 gap-3">
-        <button class="catCard bg-white rounded-3xl border shadow-sm p-4 text-left" data-cat="Yağlar">
-          <div class="text-sm text-gray-500">Kategori</div>
-          <div class="font-semibold text-lg">Yağlar</div>
-          <div class="mt-2 text-xs text-gray-500">18 L • 5 L</div>
-        </button>
-        <button class="catCard bg-white rounded-3xl border shadow-sm p-4 text-left" data-cat="Bakliyat">
-          <div class="text-sm text-gray-500">Kategori</div>
-          <div class="font-semibold text-lg">Bakliyat</div>
-          <div class="mt-2 text-xs text-gray-500">25 Kg • 10 Kg</div>
-        </button>
-        <button class="catCard bg-white rounded-3xl border shadow-sm p-4 text-left" data-cat="Soslar">
-          <div class="text-sm text-gray-500">Kategori</div>
-          <div class="font-semibold text-lg">Soslar</div>
-          <div class="mt-2 text-xs text-gray-500">5 Kg • 1 Kg</div>
-        </button>
-        <button class="catCard bg-white rounded-3xl border shadow-sm p-4 text-left" data-cat="Temel Gıda">
-          <div class="text-sm text-gray-500">Kategori</div>
-          <div class="font-semibold text-lg">Temel Gıda</div>
-          <div class="mt-2 text-xs text-gray-500">Un • Şeker • Makarna</div>
-        </button>
-        <button class="catCard bg-white rounded-3xl border shadow-sm p-4 text-left" data-cat="İçecek">
-          <div class="text-sm text-gray-500">Kategori</div>
-          <div class="font-semibold text-lg">İçecek</div>
-          <div class="mt-2 text-xs text-gray-500">Koli • Pet</div>
-        </button>
-        <button class="catCard bg-white rounded-3xl border shadow-sm p-4 text-left" data-cat="Temizlik">
-          <div class="text-sm text-gray-500">Kategori</div>
-          <div class="font-semibold text-lg">Temizlik</div>
-          <div class="mt-2 text-xs text-gray-500">4 L • 5 L</div>
-        </button>
+  <!-- Products -->
+  <main class="px-4 pt-4 pb-28">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <div class="font-semibold">Ürünler</div>
+        <div id="meta" class="text-xs text-gray-500">Yükleniyor…</div>
       </div>
-    </section>
+      <button id="sortBtn" class="text-sm font-medium px-3 py-2 rounded-xl bg-white border">Sırala: Önerilen</button>
+    </div>
 
-    <!-- CART -->
-    <section id="view-cart" class="hidden px-4 pt-4">
-      <div class="flex items-center justify-between">
-        <div class="font-semibold text-lg">Sepet</div>
-        <button id="clearCart" class="text-sm font-medium px-3 py-2 rounded-2xl bg-white border">Sepeti Boşalt</button>
-      </div>
-
-      <div id="cartEmpty" class="mt-6 bg-white rounded-3xl border p-5 text-center text-gray-500 hidden">
-        Sepetiniz boş.
-      </div>
-
-      <div id="cartList" class="mt-4 space-y-3"></div>
-
-      <div id="cartSummary" class="mt-4 bg-white rounded-3xl border p-4 hidden">
-        <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">Ara Toplam</span>
-          <span id="subtotal" class="font-semibold">₺0,00</span>
-        </div>
-        <div class="flex items-center justify-between text-sm mt-2">
-          <span class="text-gray-500">Kargo</span>
-          <span class="font-semibold">₺0,00</span>
-        </div>
-        <div class="h-px bg-gray-100 my-3"></div>
-        <div class="flex items-center justify-between">
-          <span class="font-semibold">Genel Toplam</span>
-          <span id="total" class="text-xl font-bold text-red-600">₺0,00</span>
-        </div>
-
-        <button id="goCheckout" class="mt-4 w-full h-12 rounded-2xl bg-red-600 text-white font-semibold">
-          Ödemeye Geç
-        </button>
-      </div>
-    </section>
-
-    <!-- CHECKOUT -->
-    <section id="view-checkout" class="hidden px-4 pt-4">
-      <div class="flex items-center gap-2">
-        <button id="backToCart" class="h-10 w-10 rounded-2xl bg-white border grid place-items-center">‹</button>
-        <div class="font-semibold text-lg">Ödeme</div>
-      </div>
-
-      <div class="mt-4 bg-white rounded-3xl border p-4">
-        <div class="font-semibold mb-2">Teslimat Bilgileri</div>
-        <div class="grid gap-2">
-          <input class="w-full bg-gray-100 rounded-2xl px-3 py-3 text-sm outline-none" placeholder="Firma Ünvanı" value="İhtisas Gıda Müşterisi" />
-          <input class="w-full bg-gray-100 rounded-2xl px-3 py-3 text-sm outline-none" placeholder="Telefon" value="+90 5xx xxx xx xx" />
-          <input class="w-full bg-gray-100 rounded-2xl px-3 py-3 text-sm outline-none" placeholder="İl / İlçe" value="İstanbul / ..." />
-          <textarea class="w-full bg-gray-100 rounded-2xl px-3 py-3 text-sm outline-none" rows="3" placeholder="Adres">...</textarea>
-        </div>
-      </div>
-
-      <div class="mt-3 bg-white rounded-3xl border p-4">
-        <div class="font-semibold mb-2">Ödeme Yöntemi</div>
-        <div class="grid gap-2 text-sm">
-          <label class="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-3">
-            <input type="radio" name="pay" checked />
-            <span>Kart ile Ödeme</span>
-          </label>
-          <label class="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-3">
-            <input type="radio" name="pay" />
-            <span>Havale / EFT</span>
-          </label>
-          <label class="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-3">
-            <input type="radio" name="pay" />
-            <span>Kapıda Ödeme</span>
-          </label>
-        </div>
-
-        <div class="mt-3 grid gap-2">
-          <input class="w-full bg-gray-100 rounded-2xl px-3 py-3 text-sm outline-none" placeholder="Kart Numarası" value="•••• •••• •••• ••••" />
-          <div class="grid grid-cols-2 gap-2">
-            <input class="w-full bg-gray-100 rounded-2xl px-3 py-3 text-sm outline-none" placeholder="SKT" value="MM/YY" />
-            <input class="w-full bg-gray-100 rounded-2xl px-3 py-3 text-sm outline-none" placeholder="CVV" value="•••" />
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-3 bg-white rounded-3xl border p-4">
-        <div class="flex items-center justify-between">
-          <div class="font-semibold">Sipariş Özeti</div>
-          <div id="checkoutCount" class="text-sm text-gray-500">0 ürün</div>
-        </div>
-        <div class="mt-2 flex items-center justify-between">
-          <span class="text-sm text-gray-500">Toplam</span>
-          <span id="checkoutTotal" class="text-xl font-bold text-red-600">₺0,00</span>
-        </div>
-        <button id="placeOrder" class="mt-4 w-full h-12 rounded-2xl bg-red-600 text-white font-semibold">
-          Siparişi Tamamla
-        </button>
-      </div>
-    </section>
-
-    <!-- ACCOUNT -->
-    <section id="view-account" class="hidden px-4 pt-4">
-      <div class="font-semibold text-lg mb-3">Hesap</div>
-      <div class="bg-white rounded-3xl border p-4">
-        <div class="font-semibold">Kurumsal Müşteri</div>
-        <div class="text-sm text-gray-500 mt-1">Yetkili: ...</div>
-        <div class="mt-4 grid gap-2">
-          <button class="w-full text-left bg-gray-100 rounded-2xl px-3 py-3 text-sm">📦 Siparişlerim</button>
-          <button class="w-full text-left bg-gray-100 rounded-2xl px-3 py-3 text-sm">🏷️ Fiyat Listeleri</button>
-          <button class="w-full text-left bg-gray-100 rounded-2xl px-3 py-3 text-sm">📍 Adresler</button>
-          <button class="w-full text-left bg-gray-100 rounded-2xl px-3 py-3 text-sm">⚙️ Ayarlar</button>
-        </div>
-      </div>
-    </section>
+    <div id="grid" class="grid grid-cols-2 gap-3 md:grid-cols-4"></div>
   </main>
 
   <!-- Bottom Nav -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t tabbar">
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t">
     <div class="max-w-md mx-auto px-4 py-2 grid grid-cols-4 text-xs">
-      <button class="tab flex flex-col items-center gap-1 py-2 text-red-600 font-semibold" data-view="home">🏠<span>Anasayfa</span></button>
-      <button class="tab flex flex-col items-center gap-1 py-2 text-gray-500" data-view="categories">🧾<span>Kategoriler</span></button>
-      <button class="tab flex flex-col items-center gap-1 py-2 text-gray-500 relative" data-view="cart">
-        🛒<span>Sepet</span>
-        <span id="cartBadge" class="hidden absolute top-1 right-6 text-[10px] px-2 py-[2px] rounded-full bg-red-600 text-white">0</span>
-      </button>
-      <button class="tab flex flex-col items-center gap-1 py-2 text-gray-500" data-view="account">👤<span>Hesap</span></button>
+      <button class="tab flex flex-col items-center gap-1 py-2 text-red-600 font-semibold" data-tab="home">🏠<span>Anasayfa</span></button>
+      <button class="tab flex flex-col items-center gap-1 py-2 text-gray-500" data-tab="categories">🧾<span>Kategoriler</span></button>
+      <button id="openCartTab" class="tab flex flex-col items-center gap-1 py-2 text-gray-500" data-tab="cart">🛒<span>Sepet</span></button>
+      <button class="tab flex flex-col items-center gap-1 py-2 text-gray-500" data-tab="account">👤<span>Hesap</span></button>
     </div>
   </nav>
 
+  <!-- Backdrop -->
+  <div id="backdrop" class="fixed inset-0 bg-black/40 hidden z-50"></div>
+
   <!-- Product Sheet -->
-  <div id="sheetBackdrop" class="fixed inset-0 bg-black/40 hidden z-50"></div>
   <div id="sheet" class="fixed left-0 right-0 bottom-0 z-50 hidden">
     <div class="max-w-md mx-auto bg-white rounded-t-3xl shadow-2xl p-4">
       <div class="flex items-start justify-between gap-3">
@@ -258,285 +113,278 @@
           <div id="sheetTitle" class="font-semibold text-lg">Ürün</div>
           <div id="sheetSub" class="text-sm text-gray-500">Paket</div>
         </div>
-        <button id="closeSheet" class="h-10 w-10 rounded-2xl bg-gray-100 grid place-items-center">✕</button>
+        <button id="closeSheet" class="h-10 w-10 rounded-xl bg-gray-100 grid place-items-center">✕</button>
       </div>
 
-      <div class="mt-3 h-44 rounded-2xl bg-gray-100 overflow-hidden grid place-items-center">
-        <img id="sheetImg" class="h-full w-full object-cover" alt="Ürün" />
+      <div class="mt-3 h-40 rounded-2xl bg-gray-100 grid place-items-center">
+        <!-- Box placeholder -->
+        <svg viewBox="0 0 140 90" class="h-24 w-40">
+          <path d="M18 30 L70 10 L122 30 L70 50 Z" fill="#e5e7eb"/>
+          <path d="M18 30 L70 50 L70 84 L18 64 Z" fill="#d1d5db"/>
+          <path d="M122 30 L70 50 L70 84 L122 64 Z" fill="#cbd5e1"/>
+          <path d="M18 30 L70 50 L122 30" stroke="#9ca3af" stroke-width="2" fill="none"/>
+          <text x="70" y="58" text-anchor="middle" font-size="10" fill="#6b7280">İhtisas Gıda</text>
+        </svg>
       </div>
 
       <div class="mt-4 flex items-center justify-between">
         <div>
-          <div class="text-xs text-gray-500">Fiyat</div>
-          <div id="sheetPrice" class="text-2xl font-bold text-red-600">₺0,00</div>
+          <div class="text-xs text-gray-500">Toptan Fiyat</div>
+          <div id="sheetPrice" class="text-xl font-semibold text-red-600">₺0,00</div>
           <div class="text-xs text-gray-500">KDV hariç</div>
         </div>
         <div class="flex items-center gap-2">
-          <button id="minus" class="h-11 w-11 rounded-2xl bg-gray-100 text-lg">−</button>
+          <button id="minus" class="h-11 w-11 rounded-xl bg-gray-100 text-lg">−</button>
           <div id="qty" class="min-w-10 text-center font-semibold">1</div>
-          <button id="plus" class="h-11 w-11 rounded-2xl bg-gray-100 text-lg">+</button>
+          <button id="plus" class="h-11 w-11 rounded-xl bg-gray-100 text-lg">+</button>
         </div>
       </div>
 
       <button id="addToCart" class="mt-4 w-full h-12 rounded-2xl bg-red-600 text-white font-semibold">
         Sepete Ekle
       </button>
+
+      <div class="mt-3 text-[11px] text-gray-500">
+        Sevkiyat ve fiyatlar firma anlaşmalarına göre değişebilir.
+      </div>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-24 z-50 hidden">
-    <div class="bg-gray-900 text-white text-sm px-4 py-3 rounded-2xl shadow-lg">Eklendi</div>
+  <!-- Cart Sheet -->
+  <div id="cartSheet" class="fixed left-0 right-0 bottom-0 z-50 hidden">
+    <div class="max-w-md mx-auto bg-white rounded-t-3xl shadow-2xl p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="font-semibold text-lg">Sepet</div>
+          <div id="cartMeta" class="text-sm text-gray-500">0 ürün</div>
+        </div>
+        <button id="closeCart" class="h-10 w-10 rounded-xl bg-gray-100 grid place-items-center">✕</button>
+      </div>
+
+      <div id="cartList" class="mt-3 max-h-[45vh] overflow-auto pr-1"></div>
+
+      <div class="mt-3 rounded-2xl bg-gray-50 p-3 border">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-600">Ara Toplam</span>
+          <span id="subTotal" class="font-semibold">₺0,00</span>
+        </div>
+        <div class="flex items-center justify-between text-sm mt-1">
+          <span class="text-gray-600">Kargo</span>
+          <span id="shipping" class="font-semibold">₺0,00</span>
+        </div>
+        <div class="flex items-center justify-between text-base mt-2">
+          <span class="font-semibold">Toplam</span>
+          <span id="grandTotal" class="font-bold text-red-600">₺0,00</span>
+        </div>
+      </div>
+
+      <button id="goCheckout" class="mt-3 w-full h-12 rounded-2xl bg-red-600 text-white font-semibold disabled:opacity-40" disabled>
+        Ödemeye Geç
+      </button>
+      <button id="clearCart" class="mt-2 w-full h-11 rounded-2xl bg-white border font-semibold">
+        Sepeti Temizle
+      </button>
+    </div>
+  </div>
+
+  <!-- Checkout Screen -->
+  <div id="checkout" class="fixed inset-0 z-50 hidden bg-gray-100">
+    <header class="sticky top-0 bg-white border-b">
+      <div class="px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <button id="backFromCheckout" class="h-10 w-10 rounded-xl bg-gray-100 grid place-items-center">←</button>
+          <div>
+            <div class="font-semibold">Ödeme</div>
+            <div class="text-xs text-gray-500">Teslimat ve ödeme bilgileri</div>
+          </div>
+        </div>
+        <div class="text-sm font-semibold text-red-600" id="checkoutTotal">₺0,00</div>
+      </div>
+    </header>
+
+    <main class="px-4 py-4 pb-28 max-w-md mx-auto">
+      <div class="rounded-2xl bg-white border shadow-sm p-4">
+        <div class="font-semibold">Teslimat Bilgileri</div>
+        <div class="mt-3 grid gap-2">
+          <input class="h-11 rounded-xl border px-3 outline-none" placeholder="Firma Ünvanı" />
+          <input class="h-11 rounded-xl border px-3 outline-none" placeholder="Yetkili Kişi" />
+          <input class="h-11 rounded-xl border px-3 outline-none" placeholder="Telefon" />
+          <input class="h-11 rounded-xl border px-3 outline-none" placeholder="Adres" />
+          <div class="grid grid-cols-2 gap-2">
+            <input class="h-11 rounded-xl border px-3 outline-none" placeholder="İl" />
+            <input class="h-11 rounded-xl border px-3 outline-none" placeholder="İlçe" />
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white border shadow-sm p-4 mt-3">
+        <div class="font-semibold">Ödeme Bilgileri</div>
+        <div class="mt-3 grid gap-2">
+          <input class="h-11 rounded-xl border px-3 outline-none" placeholder="Kart Üzerindeki İsim" />
+          <input class="h-11 rounded-xl border px-3 outline-none" placeholder="Kart Numarası" />
+          <div class="grid grid-cols-3 gap-2">
+            <input class="h-11 rounded-xl border px-3 outline-none" placeholder="AA" />
+            <input class="h-11 rounded-xl border px-3 outline-none" placeholder="YY" />
+            <input class="h-11 rounded-xl border px-3 outline-none" placeholder="CVC" />
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white border shadow-sm p-4 mt-3">
+        <div class="flex items-center justify-between">
+          <div class="font-semibold">Sipariş Özeti</div>
+          <button id="viewCartFromCheckout" class="text-sm font-semibold text-red-600">Sepeti Gör</button>
+        </div>
+        <div class="mt-2 text-sm text-gray-600">
+          <div class="flex justify-between"><span>Ara Toplam</span><span id="sumSub">₺0,00</span></div>
+          <div class="flex justify-between mt-1"><span>Kargo</span><span id="sumShip">₺0,00</span></div>
+          <div class="flex justify-between mt-2 text-base font-semibold"><span>Toplam</span><span id="sumTotal" class="text-red-600">₺0,00</span></div>
+        </div>
+      </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t">
+      <div class="max-w-md mx-auto p-3">
+        <button id="placeOrder" class="w-full h-12 rounded-2xl bg-red-600 text-white font-semibold">
+          Siparişi Onayla
+        </button>
+        <div class="mt-2 text-[11px] text-gray-500 text-center">
+          Ödeme ve sipariş akışı firma süreçlerine göre değişebilir.
+        </div>
+      </div>
+    </nav>
   </div>
 
 <script>
   // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
   function formatTRY(n){
     return "₺" + n.toLocaleString("tr-TR", {minimumFractionDigits:2, maximumFractionDigits:2});
   }
-
-  // Simple box placeholder image (SVG data URI)
-  function boxImg(text){
-    const t = String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const svg =
-`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f3f4f6"/>
-      <stop offset="1" stop-color="#e5e7eb"/>
-    </linearGradient>
-  </defs>
-  <rect width="100%" height="100%" fill="url(#g)"/>
-  <rect x="70" y="80" width="660" height="340" rx="36" fill="#ffffff" stroke="#e5e7eb" stroke-width="6"/>
-  <rect x="120" y="140" width="560" height="120" rx="28" fill="#fee2e2"/>
-  <text x="400" y="215" text-anchor="middle" font-family="Arial" font-size="44" fill="#b91c1c" font-weight="700">İHTİSAS GIDA</text>
-  <text x="400" y="305" text-anchor="middle" font-family="Arial" font-size="34" fill="#111827" font-weight="700">${t}</text>
-  <text x="400" y="360" text-anchor="middle" font-family="Arial" font-size="18" fill="#6b7280">Toptan • Kurumsal • Hızlı</text>
-</svg>`;
-    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  function openOverlay(which){
+    $("backdrop").classList.remove("hidden");
+    which.classList.remove("hidden");
+  }
+  function closeOverlay(which){
+    which.classList.add("hidden");
+    $("backdrop").classList.add("hidden");
   }
 
-  // ---------- Product Data (HoReCa / Ev Dışı Tüketim odaklı) ----------
-  const seed = [
-    // Yağlar (18 L / 10 L / 5 L)
-    {name:"Ayçiçek Yağı", packs:["18 L Teneke","10 L Teneke","5 L Teneke"], cat:"Yağlar", base:1260},
-    {name:"Mısır Yağı", packs:["18 L Teneke","10 L Teneke","5 L Teneke"], cat:"Yağlar", base:1320},
-    {name:"Kızartma Yağı", packs:["18 L Teneke","10 L Teneke"], cat:"Yağlar", base:1380},
-    {name:"Zeytinyağı Riviera", packs:["5 L Teneke","2 L Pet","1 L Pet"], cat:"Yağlar", base:980},
-
-    // Bakliyat (25 kg / 10 kg / 5 kg)
-    {name:"Pirinç Baldo", packs:["25 Kg","10 Kg","5 Kg"], cat:"Bakliyat", base:2350},
-    {name:"Pirinç Osmancık", packs:["25 Kg","10 Kg","5 Kg"], cat:"Bakliyat", base:2150},
-    {name:"Nohut", packs:["25 Kg","10 Kg","5 Kg"], cat:"Bakliyat", base:2650},
-    {name:"Kuru Fasulye", packs:["25 Kg","10 Kg","5 Kg"], cat:"Bakliyat", base:2950},
-    {name:"Kırmızı Mercimek", packs:["25 Kg","10 Kg","5 Kg"], cat:"Bakliyat", base:2450},
-    {name:"Yeşil Mercimek", packs:["25 Kg","10 Kg","5 Kg"], cat:"Bakliyat", base:2650},
-
-    // Soslar (5 kg / 1 kg / 850 g)
-    {name:"Domates Salça", packs:["5 Kg","1 Kg"], cat:"Soslar", base:520},
-    {name:"Ketçap", packs:["5 Kg","1 Kg"], cat:"Soslar", base:490},
-    {name:"Mayonez", packs:["5 Kg","1 Kg"], cat:"Soslar", base:540},
-    {name:"BBQ Sos", packs:["1 Kg","500 g"], cat:"Soslar", base:180},
-    {name:"Pesto Sos", packs:["1 Kg","500 g"], cat:"Soslar", base:260},
-
-    // Temel Gıda
-    {name:"Un", packs:["25 Kg","10 Kg"], cat:"Temel Gıda", base:620},
-    {name:"Toz Şeker", packs:["25 Kg","10 Kg","5 Kg"], cat:"Temel Gıda", base:980},
-    {name:"Makarna", packs:["5 Kg","500 g x 20"], cat:"Temel Gıda", base:340},
-    {name:"Çay", packs:["5 Kg","1 Kg"], cat:"Temel Gıda", base:890},
-    {name:"Tuz", packs:["25 Kg","10 Kg"], cat:"Temel Gıda", base:210},
-
-    // İçecek
-    {name:"Su", packs:["1.5 L x 12","0.5 L x 24"], cat:"İçecek", base:120},
-    {name:"Gazlı İçecek", packs:["1 L x 12","330 ml x 24"], cat:"İçecek", base:340},
-    {name:"Meyve Suyu", packs:["1 L x 12"], cat:"İçecek", base:380},
-    {name:"Ayran", packs:["1 L x 12","200 ml x 27"], cat:"İçecek", base:420},
-
-    // Temizlik
-    {name:"Bulaşık Deterjanı", packs:["4 L","20 L Bidon"], cat:"Temizlik", base:210},
-    {name:"Yüzey Temizleyici", packs:["4 L","20 L Bidon"], cat:"Temizlik", base:180},
-    {name:"Çamaşır Suyu", packs:["4 L","20 L Bidon"], cat:"Temizlik", base:120},
+  // ---------- Data (HORECA / ev dışı tüketim odaklı) ----------
+  const base = [
+    {name:"Ayçiçek Yağı", pack:"18 L Teneke", cat:"Yağlar", price:1650},
+    {name:"Mısır Yağı", pack:"18 L Teneke", cat:"Yağlar", price:1725},
+    {name:"Zeytinyağı Riviera", pack:"5 L Teneke", cat:"Yağlar", price:980},
+    {name:"Sıvı Yağ", pack:"5 L Pet", cat:"Yağlar", price:355},
+    {name:"Pirinç Osmancık", pack:"25 Kg Çuval", cat:"Bakliyat", price:2350},
+    {name:"Pirinç Baldo", pack:"5 Kg", cat:"Bakliyat", price:325},
+    {name:"Kırmızı Mercimek", pack:"10 Kg", cat:"Bakliyat", price:625},
+    {name:"Nohut", pack:"10 Kg", cat:"Bakliyat", price:780},
+    {name:"Kuru Fasulye", pack:"10 Kg", cat:"Bakliyat", price:920},
+    {name:"Domates Salça", pack:"5 Kg", cat:"Soslar", price:295},
+    {name:"Biber Salça", pack:"5 Kg", cat:"Soslar", price:315},
+    {name:"Ketçap", pack:"5 Kg", cat:"Soslar", price:240},
+    {name:"Mayonez", pack:"5 Kg", cat:"Soslar", price:265},
+    {name:"Soya Sos", pack:"1 L", cat:"Soslar", price:120},
+    {name:"Toz Şeker", pack:"50 Kg Çuval", cat:"Temel Gıda", price:3450},
+    {name:"Un", pack:"25 Kg Çuval", cat:"Temel Gıda", price:720},
+    {name:"Makarna", pack:"500 g x 20 Koli", cat:"Temel Gıda", price:290},
+    {name:"Çay", pack:"5 Kg", cat:"Temel Gıda", price:850},
+    {name:"Gazlı İçecek", pack:"1 L x 12 Koli", cat:"İçecek", price:210},
+    {name:"Meyve Suyu", pack:"1 L x 12 Koli", cat:"İçecek", price:275},
+    {name:"Su", pack:"1.5 L x 6", cat:"İçecek", price:58},
+    {name:"Bulaşık Deterjanı", pack:"20 L Bidon", cat:"Temizlik", price:980},
+    {name:"Yüzey Temizleyici", pack:"20 L Bidon", cat:"Temizlik", price:720},
+    {name:"Çamaşır Suyu", pack:"20 L Bidon", cat:"Temizlik", price:410},
   ];
 
-  // Generate ~100 products from seed by expanding packs + variants
+  // 100'e yakın ürün hissi için varyasyon üret
+  const altPacks = [
+    "18 L Teneke","5 L Teneke","5 L Pet",
+    "25 Kg Çuval","10 Kg","5 Kg",
+    "500 g x 20 Koli","1 L x 12 Koli","20 L Bidon"
+  ];
+
   const products = [];
   let id = 1;
-  const variants = ["Standart", "Ekonomik", "Premium", "Profesyonel"];
-  for (const s of seed){
-    for (let i=0; i<s.packs.length; i++){
-      for (let v=0; v<variants.length; v++){
-        const name = (v === 0) ? s.name : `${s.name} ${variants[v]}`;
-        const pack = s.packs[i];
-        const price = Math.round(s.base * (0.85 + (i*0.05) + (v*0.04)));
-        products.push({
-          id: id++,
-          name,
-          pack,
-          cat: s.cat,
-          price,
-          img: boxImg(`${s.name} • ${pack}`)
-        });
-      }
+  for (let r=0; r<6; r++){
+    for (const p of base){
+      const pack = altPacks[(r + p.name.length) % altPacks.length];
+      const factor = 0.92 + (r*0.03);
+      const price = Math.max(12, Math.round(p.price * factor));
+      const tag = (p.cat === "Yağlar" && pack.includes("18")) ? "HORECA" :
+                  (pack.includes("Koli") || pack.includes("Çuval")) ? "Koli" : "";
+      products.push({ id:id++, name:p.name, pack, cat:p.cat, price, tag });
+      if (products.length >= 100) break;
     }
+    if (products.length >= 100) break;
   }
-  // trim to 100-110 range
-  while (products.length > 104) products.pop();
 
   // ---------- State ----------
-  let state = {
-    view: "home",
-    cat: "Tümü",
-    q: "",
-    sort: "recommended", // priceAsc | priceDesc | nameAsc
-    cart: new Map(), // id -> qty
-  };
-
-  // ---------- Elements ----------
-  const grid = document.getElementById("grid");
-  const meta = document.getElementById("meta");
-  const qInput = document.getElementById("q");
-  const clearBtn = document.getElementById("clearBtn");
-  const sortBtn = document.getElementById("sortBtn");
-  const cartBadge = document.getElementById("cartBadge");
-
-  const views = {
-    home: document.getElementById("view-home"),
-    categories: document.getElementById("view-categories"),
-    cart: document.getElementById("view-cart"),
-    checkout: document.getElementById("view-checkout"),
-    account: document.getElementById("view-account"),
-  };
-
-  // Sheet
-  const sheetBackdrop = document.getElementById("sheetBackdrop");
-  const sheet = document.getElementById("sheet");
-  const closeSheet = document.getElementById("closeSheet");
-  const sheetTitle = document.getElementById("sheetTitle");
-  const sheetSub = document.getElementById("sheetSub");
-  const sheetPrice = document.getElementById("sheetPrice");
-  const sheetImg = document.getElementById("sheetImg");
-  const qtyEl = document.getElementById("qty");
-  let sheetQty = 1;
+  let state = { cat:"Tümü", q:"", sort:"recommended" };
   let current = null;
+  let qty = 1;
 
-  // Toast
-  const toast = document.getElementById("toast");
-  let toastTimer = null;
-  function showToast(text){
-    toast.querySelector("div").textContent = text;
-    toast.classList.remove("hidden");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=>toast.classList.add("hidden"), 1200);
-  }
+  // Cart: {productId: quantity}
+  const cart = new Map();
 
-  // Banner
-  const banners = [
-    {k:"Haftanın Fırsatları", t:"Ev Dışı Tüketim Ürün Gamı", tags:["18 L Yağlar","5 Kg Soslar","25 Kg Bakliyat"]},
-    {k:"Toplu Alım", t:"Koli & Teneke Avantajları", tags:["Koli İçecek","20 L Bidon","25 Kg Çuval"]},
-    {k:"Hızlı Teslimat", t:"Bölgesel Sevkiyat Planı", tags:["Kurumsal","Toptan","Süreç Takibi"]},
-  ];
-  let bannerIdx = 0;
-  const bannerK = document.getElementById("bannerKicker");
-  const bannerT = document.getElementById("bannerTitle");
-  const bannerTags = document.getElementById("bannerTags");
-  function renderBanner(){
-    const b = banners[bannerIdx];
-    bannerK.textContent = b.k;
-    bannerT.textContent = b.t;
-    bannerTags.innerHTML = b.tags.map(x=>`<span class="px-3 py-1 rounded-full bg-white/15 text-xs">${x}</span>`).join("");
-  }
-  document.getElementById("bannerPrev").addEventListener("click", ()=>{
-    bannerIdx = (bannerIdx - 1 + banners.length) % banners.length;
-    renderBanner();
-  });
-  document.getElementById("bannerNext").addEventListener("click", ()=>{
-    bannerIdx = (bannerIdx + 1) % banners.length;
-    renderBanner();
-  });
+  // ---------- UI refs ----------
+  const grid = $("grid");
+  const meta = $("meta");
+  const qInput = $("q");
+  const clearBtn = $("clearBtn");
+  const sortBtn = $("sortBtn");
 
-  // ---------- Filtering / Sorting ----------
+  // ---------- Filtering / sorting ----------
   function filtered(){
     let list = [...products];
-
-    if(state.cat !== "Tümü"){
-      list = list.filter(x => x.cat === state.cat);
-    }
+    if(state.cat !== "Tümü") list = list.filter(x => x.cat === state.cat);
     if(state.q.trim()){
       const t = state.q.trim().toLowerCase();
-      list = list.filter(x =>
-        (x.name + " " + x.pack + " " + x.cat).toLowerCase().includes(t)
-      );
+      list = list.filter(x => (x.name+" "+x.pack+" "+x.cat).toLowerCase().includes(t));
     }
-
     if(state.sort === "priceAsc") list.sort((a,b)=>a.price-b.price);
     if(state.sort === "priceDesc") list.sort((a,b)=>b.price-a.price);
     if(state.sort === "nameAsc") list.sort((a,b)=>a.name.localeCompare(b.name, "tr"));
-
     return list;
   }
 
-  function renderGrid(){
+  function boxSVG(label){
+    const safe = (label || "Ürün").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return `
+      <svg viewBox="0 0 140 90" class="h-16 w-full">
+        <path d="M18 30 L70 10 L122 30 L70 50 Z" fill="#e5e7eb"/>
+        <path d="M18 30 L70 50 L70 84 L18 64 Z" fill="#d1d5db"/>
+        <path d="M122 30 L70 50 L70 84 L122 64 Z" fill="#cbd5e1"/>
+        <path d="M18 30 L70 50 L122 30" stroke="#9ca3af" stroke-width="2" fill="none"/>
+        <text x="70" y="58" text-anchor="middle" font-size="10" fill="#6b7280">${safe}</text>
+      </svg>
+    `;
+  }
+
+  // ---------- Render products ----------
+  function render(){
     const list = filtered();
     meta.textContent = `${list.length} ürün • ${state.cat}${state.q ? " • " + state.q : ""}`;
 
     grid.innerHTML = list.map(p => `
-      <button class="group bg-white rounded-3xl border shadow-sm active:scale-[0.99] transition p-3 text-left"
-              onclick="openSheet(${p.id})">
-        <div class="h-24 rounded-2xl bg-gray-100 overflow-hidden">
-          <img src="${p.img}" alt="${p.name}" class="h-full w-full object-cover"/>
+      <button class="group bg-white rounded-2xl border shadow-sm active:scale-[0.99] transition p-3 text-left"
+              onclick="openProduct(${p.id})">
+        <div class="h-24 rounded-xl bg-gray-100 grid place-items-center overflow-hidden">
+          ${boxSVG("İhtisas")}
         </div>
         <div class="mt-2 text-sm font-semibold leading-snug line-clamp-2">${p.name}</div>
         <div class="text-xs text-gray-500">${p.pack}</div>
-        <div class="mt-2 flex items-end justify-between gap-2">
+        <div class="mt-1 flex items-end justify-between gap-2">
           <div class="text-red-600 font-bold">${formatTRY(p.price)}</div>
           <span class="text-[10px] px-2 py-1 rounded-full bg-gray-100 text-gray-600">${p.cat}</span>
         </div>
+        ${p.tag ? `<div class="mt-2 text-[10px] inline-flex px-2 py-1 rounded-full bg-red-50 text-red-700 font-semibold">${p.tag}</div>` : ``}
       </button>
     `).join("");
   }
 
-  // ---------- Navigation ----------
-  function setView(v){
-    state.view = v;
-    Object.keys(views).forEach(k => views[k].classList.toggle("hidden", k !== v));
-    document.querySelectorAll(".tab").forEach(t=>{
-      const active = t.dataset.view === v || (v==="checkout" && t.dataset.view==="cart");
-      t.classList.toggle("text-red-600", active);
-      t.classList.toggle("font-semibold", active);
-      t.classList.toggle("text-gray-500", !active);
-    });
-
-    // Render view-specific
-    if(v === "home"){ renderGrid(); }
-    if(v === "cart"){ renderCart(); }
-    if(v === "checkout"){ renderCheckout(); }
-    window.scrollTo({top:0, behavior:"instant"});
-  }
-
-  document.querySelectorAll(".tab").forEach(t=>{
-    t.addEventListener("click", ()=> setView(t.dataset.view));
-  });
-
-  // Category cards
-  document.querySelectorAll(".catCard").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const c = btn.dataset.cat;
-      // select chip visually
-      state.cat = c;
-      document.querySelectorAll(".chip").forEach(b=>{
-        b.classList.remove("bg-red-600","text-white");
-        b.classList.add("bg-gray-100");
-        if(b.dataset.cat === c){
-          b.classList.add("bg-red-600","text-white");
-          b.classList.remove("bg-gray-100");
-        }
-      });
-      setView("home");
-      renderGrid();
-    });
-  });
-
-  // Chips
+  // ---------- Chips ----------
   document.querySelectorAll(".chip").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       state.cat = btn.dataset.cat;
@@ -546,31 +394,24 @@
       });
       btn.classList.add("bg-red-600","text-white");
       btn.classList.remove("bg-gray-100");
-      renderGrid();
+      render();
     });
   });
 
-  // Search open/clear
-  const searchWrap = document.getElementById("searchWrap");
-  document.getElementById("searchOpen").addEventListener("click", ()=>{
-    searchWrap.classList.toggle("hidden");
-    if(!searchWrap.classList.contains("hidden")) qInput.focus();
-  });
-
+  // ---------- Search ----------
   qInput.addEventListener("input", (e)=>{
     state.q = e.target.value;
     clearBtn.classList.toggle("hidden", !state.q);
-    if(state.view !== "home") setView("home");
-    renderGrid();
+    render();
   });
   clearBtn.addEventListener("click", ()=>{
     state.q = "";
     qInput.value = "";
     clearBtn.classList.add("hidden");
-    renderGrid();
+    render();
   });
 
-  // Sort
+  // ---------- Sort ----------
   const sortModes = [
     {key:"recommended", label:"Önerilen"},
     {key:"priceAsc", label:"Fiyat ↑"},
@@ -582,131 +423,238 @@
     const next = sortModes[(idx+1) % sortModes.length];
     state.sort = next.key;
     sortBtn.textContent = "Sırala: " + next.label;
-    renderGrid();
+    render();
   });
 
-  // ---------- Product Sheet ----------
-  window.openSheet = function(id){
+  // ---------- Bottom tabs (visual only) ----------
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      document.querySelectorAll(".tab").forEach(x=>{
+        x.classList.remove("text-red-600","font-semibold");
+        x.classList.add("text-gray-500");
+      });
+      t.classList.add("text-red-600","font-semibold");
+      t.classList.remove("text-gray-500");
+    });
+  });
+
+  // ---------- Product sheet ----------
+  const sheet = $("sheet");
+  const closeSheet = $("closeSheet");
+  const sheetTitle = $("sheetTitle");
+  const sheetSub = $("sheetSub");
+  const sheetPrice = $("sheetPrice");
+  const qtyEl = $("qty");
+
+  window.openProduct = function(id){
     current = products.find(x=>x.id===id);
-    sheetQty = 1;
-    qtyEl.textContent = sheetQty;
+    qty = 1;
+    qtyEl.textContent = qty;
     sheetTitle.textContent = current.name;
-    sheetSub.textContent = `${current.pack} • ${current.cat}`;
+    sheetSub.textContent = current.pack + " • " + current.cat;
     sheetPrice.textContent = formatTRY(current.price);
-    sheetImg.src = current.img;
+    openOverlay(sheet);
+  };
 
-    sheetBackdrop.classList.remove("hidden");
-    sheet.classList.remove("hidden");
+  function closeProduct(){
+    closeOverlay(sheet);
   }
-
-  function closeSheetFn(){
-    sheetBackdrop.classList.add("hidden");
-    sheet.classList.add("hidden");
-  }
-  closeSheet.addEventListener("click", closeSheetFn);
-  sheetBackdrop.addEventListener("click", closeSheetFn);
-
-  document.getElementById("minus").addEventListener("click", ()=>{
-    sheetQty = Math.max(1, sheetQty-1);
-    qtyEl.textContent = sheetQty;
+  closeSheet.addEventListener("click", closeProduct);
+  $("backdrop").addEventListener("click", ()=>{
+    // If cart sheet open, don't close product from backdrop (we'll handle with z order)
+    if(!sheet.classList.contains("hidden")) closeProduct();
+    if(!cartSheet.classList.contains("hidden")) closeCart();
   });
-  document.getElementById("plus").addEventListener("click", ()=>{
-    sheetQty = sheetQty+1;
-    qtyEl.textContent = sheetQty;
+
+  $("minus").addEventListener("click", ()=>{
+    qty = Math.max(1, qty-1);
+    qtyEl.textContent = qty;
+  });
+  $("plus").addEventListener("click", ()=>{
+    qty = qty+1;
+    qtyEl.textContent = qty;
+  });
+
+  $("addToCart").addEventListener("click", ()=>{
+    if(!current) return;
+    const existing = cart.get(current.id) || 0;
+    cart.set(current.id, existing + qty);
+    updateCartBadges();
+    closeProduct();
+    openCart(); // hissiyat için direkt sepeti aç
   });
 
   // ---------- Cart ----------
-  function cartCount(){
-    let c = 0;
-    for(const q of state.cart.values()) c += q;
-    return c;
-  }
-  function setBadge(){
-    const c = cartCount();
-    cartBadge.textContent = c;
-    cartBadge.classList.toggle("hidden", c === 0);
-  }
-  function addToCart(id, qty){
-    const prev = state.cart.get(id) || 0;
-    state.cart.set(id, prev + qty);
-    setBadge();
-  }
-  function removeFromCart(id){
-    state.cart.delete(id);
-    setBadge();
-  }
-  function setCartQty(id, qty){
-    if(qty <= 0) return removeFromCart(id);
-    state.cart.set(id, qty);
-    setBadge();
-  }
-  function subtotal(){
-    let sum = 0;
-    for(const [id, qty] of state.cart.entries()){
-      const p = products.find(x=>x.id===id);
-      sum += (p.price * qty);
+  const cartSheet = $("cartSheet");
+  const cartList = $("cartList");
+  const cartMeta = $("cartMeta");
+  const subTotal = $("subTotal");
+  const shipping = $("shipping");
+  const grandTotal = $("grandTotal");
+  const checkoutTotal = $("checkoutTotal");
+  const sumSub = $("sumSub");
+  const sumShip = $("sumShip");
+  const sumTotal = $("sumTotal");
+
+  function cartItems(){
+    const items = [];
+    for(const [pid, q] of cart.entries()){
+      const p = products.find(x=>x.id===pid);
+      if(p) items.push({ ...p, qty:q });
     }
-    return sum;
+    return items;
   }
 
-  document.getElementById("addToCart").addEventListener("click", ()=>{
-    addToCart(current.id, sheetQty);
-    closeSheetFn();
-    showToast("Sepete eklendi");
-  });
+  function calcTotals(){
+    const items = cartItems();
+    const sub = items.reduce((acc,it)=>acc + it.price*it.qty, 0);
+    const ship = sub > 1500 ? 0 : (sub === 0 ? 0 : 149); // basit kural
+    const total = sub + ship;
+    return { sub, ship, total, count: items.reduce((a,i)=>a+i.qty,0), lines: items.length };
+  }
 
-  // Cart render
-  const cartEmpty = document.getElementById("cartEmpty");
-  const cartList = document.getElementById("cartList");
-  const cartSummary = document.getElementById("cartSummary");
-  const subtotalEl = document.getElementById("subtotal");
-  const totalEl = document.getElementById("total");
+  function updateCartBadges(){
+    const {count} = calcTotals();
+    $("cartCountTop").textContent = count;
+  }
 
   function renderCart(){
-    const items = [...state.cart.entries()].map(([id, qty])=>{
-      const p = products.find(x=>x.id===id);
-      return {p, qty};
-    });
+    const items = cartItems();
+    const t = calcTotals();
 
-    cartEmpty.classList.toggle("hidden", items.length !== 0);
-    cartSummary.classList.toggle("hidden", items.length === 0);
+    cartMeta.textContent = `${t.lines} kalem • ${t.count} adet`;
+    subTotal.textContent = formatTRY(t.sub);
+    shipping.textContent = formatTRY(t.ship);
+    grandTotal.textContent = formatTRY(t.total);
 
-    cartList.innerHTML = items.map(({p, qty})=>`
-      <div class="bg-white rounded-3xl border p-3 flex gap-3">
-        <div class="h-20 w-20 rounded-2xl bg-gray-100 overflow-hidden shrink-0">
-          <img src="${p.img}" class="h-full w-full object-cover" alt="${p.name}"/>
+    // enable checkout
+    $("goCheckout").disabled = (t.count === 0);
+
+    if(items.length === 0){
+      cartList.innerHTML = `
+        <div class="py-10 text-center text-gray-500">
+          Sepetiniz boş.
+        </div>
+      `;
+      return;
+    }
+
+    cartList.innerHTML = items.map(it => `
+      <div class="flex gap-3 items-start bg-white border rounded-2xl p-3 mb-2">
+        <div class="h-14 w-16 rounded-xl bg-gray-100 grid place-items-center overflow-hidden">
+          ${boxSVG("İhtisas")}
         </div>
         <div class="flex-1">
-          <div class="font-semibold text-sm line-clamp-2">${p.name}</div>
-          <div class="text-xs text-gray-500">${p.pack}</div>
-          <div class="mt-2 flex items-center justify-between">
-            <div class="text-red-600 font-bold">${formatTRY(p.price)}</div>
+          <div class="text-sm font-semibold leading-snug">${it.name}</div>
+          <div class="text-xs text-gray-500">${it.pack} • ${it.cat}</div>
+          <div class="mt-1 flex items-center justify-between">
+            <div class="text-sm font-bold text-red-600">${formatTRY(it.price)}</div>
             <div class="flex items-center gap-2">
-              <button class="h-9 w-9 rounded-2xl bg-gray-100" onclick="cartDec(${p.id})">−</button>
-              <div class="min-w-6 text-center font-semibold">${qty}</div>
-              <button class="h-9 w-9 rounded-2xl bg-gray-100" onclick="cartInc(${p.id})">+</button>
-              <button class="h-9 px-3 rounded-2xl bg-gray-100 text-sm" onclick="cartDel(${p.id})">Sil</button>
+              <button class="h-9 w-9 rounded-xl bg-gray-100" onclick="cartDec(${it.id})">−</button>
+              <div class="min-w-6 text-center font-semibold tabular-nums">${it.qty}</div>
+              <button class="h-9 w-9 rounded-xl bg-gray-100" onclick="cartInc(${it.id})">+</button>
             </div>
           </div>
         </div>
       </div>
     `).join("");
-
-    const s = subtotal();
-    subtotalEl.textContent = formatTRY(s);
-    totalEl.textContent = formatTRY(s);
   }
 
-  window.cartInc = (id)=>{ setCartQty(id, (state.cart.get(id)||0)+1); renderCart(); };
-  window.cartDec = (id)=>{ setCartQty(id, (state.cart.get(id)||0)-1); renderCart(); };
-  window.cartDel = (id)=>{ removeFromCart(id); renderCart(); };
+  function openCart(){
+    renderCart();
+    openOverlay(cartSheet);
+  }
+  function closeCart(){
+    closeOverlay(cartSheet);
+  }
 
-  document.getElementById("clearCart").addEventListener("click", ()=>{
-    state.cart.clear();
-    setBadge();
+  $("openCartTop").addEventListener("click", openCart);
+  $("openCartTab").addEventListener("click", openCart);
+  $("closeCart").addEventListener("click", closeCart);
+
+  window.cartInc = function(pid){
+    cart.set(pid, (cart.get(pid)||0) + 1);
+    updateCartBadges();
+    renderCart();
+  }
+  window.cartDec = function(pid){
+    const cur = cart.get(pid)||0;
+    if(cur <= 1) cart.delete(pid);
+    else cart.set(pid, cur-1);
+    updateCartBadges();
+    renderCart();
+  }
+
+  $("clearCart").addEventListener("click", ()=>{
+    cart.clear();
+    updateCartBadges();
     renderCart();
   });
 
-  // Checkout
-  document.getElementById("goCheckout").addEventListener("click", ()=> setView("checkout"));
-  document.getElementById("backToCart").addEventListener("click",
+  // Featured shortcut: jump to Yağlar & 18L query
+  $("gotoFeatured").addEventListener("click", ()=>{
+    state.cat = "Yağlar";
+    document.querySelectorAll(".chip").forEach(b=>{
+      b.classList.remove("bg-red-600","text-white");
+      b.classList.add("bg-gray-100");
+    });
+    const oilChip = [...document.querySelectorAll(".chip")].find(x=>x.dataset.cat==="Yağlar");
+    if(oilChip){
+      oilChip.classList.add("bg-red-600","text-white");
+      oilChip.classList.remove("bg-gray-100");
+    }
+    state.q = "18";
+    qInput.value = "18";
+    clearBtn.classList.remove("hidden");
+    render();
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+
+  // ---------- Checkout ----------
+  const checkout = $("checkout");
+
+  function syncCheckoutSummary(){
+    const t = calcTotals();
+    checkoutTotal.textContent = formatTRY(t.total);
+    sumSub.textContent = formatTRY(t.sub);
+    sumShip.textContent = formatTRY(t.ship);
+    sumTotal.textContent = formatTRY(t.total);
+  }
+
+  $("goCheckout").addEventListener("click", ()=>{
+    closeCart();
+    syncCheckoutSummary();
+    checkout.classList.remove("hidden");
+    // backdrop kapalı kalsın, checkout tam ekran
+    $("backdrop").classList.add("hidden");
+  });
+
+  $("backFromCheckout").addEventListener("click", ()=>{
+    checkout.classList.add("hidden");
+    openCart();
+  });
+
+  $("viewCartFromCheckout").addEventListener("click", ()=>{
+    checkout.classList.add("hidden");
+    openCart();
+  });
+
+  $("placeOrder").addEventListener("click", ()=>{
+    // Sipariş verildi hissi
+    const t = calcTotals();
+    if(t.count === 0){
+      alert("Sepet boş.");
+      return;
+    }
+    alert("Siparişiniz alınmıştır. Teşekkürler.");
+    cart.clear();
+    updateCartBadges();
+    checkout.classList.add("hidden");
+  });
+
+  // ---------- Init ----------
+  updateCartBadges();
+  render();
+</script>
+</body>
+</html>
