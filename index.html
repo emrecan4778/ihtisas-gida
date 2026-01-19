@@ -3,89 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İhtisas Gıda - B2B Market</title>
+    <title>İhtisas Gıda - B2B Toptan Market</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .product-card:hover { transform: translateY(-4px); }
+        .product-card { transition: all 0.3s ease; }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-100">
+    
     <!-- Header -->
-    <header class="bg-green-600 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
-                    </svg>
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between gap-4">
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <div class="bg-orange-500 text-white p-2 rounded-lg">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3z"/>
+                        </svg>
+                    </div>
                     <div>
-                        <h1 class="text-2xl font-bold">İhtisas Gıda</h1>
-                        <p class="text-xs text-green-100">B2B Toplu Tüketim</p>
+                        <h1 class="text-lg font-bold text-gray-800">İhtisas Gıda</h1>
+                        <p class="text-xs text-gray-500">B2B Toptan Market</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleCart()" class="relative">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">0</span>
-                    </button>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-md hidden md:block">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Ürün ara..." 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
+                        oninput="searchProducts(this.value)"
+                    >
                 </div>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCart()" class="relative bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3z"/>
+                    </svg>
+                    <span class="hidden md:inline">Sepet</span>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">0</span>
+                </button>
+            </div>
+
+            <!-- Mobile Search -->
+            <div class="md:hidden mt-3">
+                <input 
+                    type="text" 
+                    placeholder="Ürün ara..." 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
+                    oninput="searchProducts(this.value)"
+                >
             </div>
         </div>
     </header>
 
-    <!-- Categories -->
-    <div class="bg-white border-b sticky top-16 z-40">
-        <div class="container mx-auto px-4">
-            <div class="flex gap-2 overflow-x-auto py-3 scrollbar-hide">
-                <button onclick="filterCategory('all')" class="category-btn px-4 py-2 rounded-full bg-green-600 text-white whitespace-nowrap text-sm font-medium">
-                    Tümü
-                </button>
-                <button onclick="filterCategory('Kahvaltılık')" class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-green-100 whitespace-nowrap text-sm font-medium">
-                    Kahvaltılık
-                </button>
-                <button onclick="filterCategory('Temel Gıda - Bakliyat')" class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-green-100 whitespace-nowrap text-sm font-medium">
-                    Bakliyat
-                </button>
-                <button onclick="filterCategory('Temel Gıda - Yağ')" class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-green-100 whitespace-nowrap text-sm font-medium">
-                    Yağlar
-                </button>
-                <button onclick="filterCategory('Temel Gıda - Salça')" class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-green-100 whitespace-nowrap text-sm font-medium">
-                    Salça
-                </button>
-                <button onclick="filterCategory('Temel Gıda - Konserve')" class="category-btn px-4 py-2 rounded-full bg-gray-200 hover:bg-green-100 whitespace-nowrap text-sm font-medium">
-                    Konserve
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Products Grid -->
+    <!-- Main Content -->
     <div class="container mx-auto px-4 py-6">
-        <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- Products will be loaded here -->
+        <div class="flex gap-6">
+            
+            <!-- Sidebar Categories -->
+            <aside class="hidden lg:block w-64 bg-white rounded-lg shadow-md p-4 h-fit sticky top-24">
+                <h2 class="text-lg font-bold mb-4 text-gray-800">Kategoriler</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <button onclick="filterCategory('all')" class="category-link w-full text-left px-3 py-2 rounded hover:bg-orange-50 text-orange-600 font-semibold">
+                            Tüm Ürünler
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterCategory('Kahvaltılık')" class="category-link w-full text-left px-3 py-2 rounded hover:bg-gray-100">
+                            Kahvaltılık Ürünler
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterCategory('Temel Gıda - Bakliyat')" class="category-link w-full text-left px-3 py-2 rounded hover:bg-gray-100">
+                            Bakliyat
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterCategory('Temel Gıda - Yağ')" class="category-link w-full text-left px-3 py-2 rounded hover:bg-gray-100">
+                            Yağlar & Margarin
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterCategory('Temel Gıda - Salça')" class="category-link w-full text-left px-3 py-2 rounded hover:bg-gray-100">
+                            Salça
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterCategory('Temel Gıda - Konserve')" class="category-link w-full text-left px-3 py-2 rounded hover:bg-gray-100">
+                            Konserve Ürünler
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterCategory('Temel Gıda - Makarna')" class="category-link w-full text-left px-3 py-2 rounded hover:bg-gray-100">
+                            Makarna & Un
+                        </button>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Mobile Categories -->
+            <div class="lg:hidden w-full mb-4">
+                <select onchange="filterCategory(this.value)" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white">
+                    <option value="all">Tüm Ürünler</option>
+                    <option value="Kahvaltılık">Kahvaltılık Ürünler</option>
+                    <option value="Temel Gıda - Bakliyat">Bakliyat</option>
+                    <option value="Temel Gıda - Yağ">Yağlar & Margarin</option>
+                    <option value="Temel Gıda - Salça">Salça</option>
+                    <option value="Temel Gıda - Konserve">Konserve Ürünler</option>
+                    <option value="Temel Gıda - Makarna">Makarna & Un</option>
+                </select>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="flex-1">
+                <div class="mb-4">
+                    <p class="text-gray-600"><span id="productCount">0</span> ürün bulundu</p>
+                </div>
+                <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Products will load here -->
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Cart Sidebar -->
     <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
         <div class="flex flex-col h-full">
-            <div class="bg-green-600 text-white p-4 flex items-center justify-between">
+            <div class="bg-orange-500 text-white p-4 flex items-center justify-between">
                 <h2 class="text-xl font-bold">Sepetim</h2>
-                <button onclick="toggleCart()" class="text-white">
+                <button onclick="toggleCart()">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
             <div id="cartItems" class="flex-1 overflow-y-auto p-4">
-                <!-- Cart items will be here -->
+                <div class="text-center text-gray-500 py-8">Sepetiniz boş</div>
             </div>
             <div class="border-t p-4 bg-gray-50">
-                <div class="flex justify-between mb-4 text-lg font-bold">
-                    <span>Toplam:</span>
-                    <span id="cartTotal">0.00 ₺</span>
+                <div class="flex justify-between mb-4">
+                    <span class="font-semibold">Toplam:</span>
+                    <span id="cartTotal" class="font-bold text-xl text-orange-600">0.00 ₺</span>
                 </div>
-                <button class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">
+                <button class="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition">
                     Sipariş Ver
                 </button>
             </div>
@@ -93,14 +161,14 @@
     </div>
 
     <script>
-        // SUPABASE BAĞLANTI - KENDİ BİLGİLERİNİZİ GİRİN
+        // SUPABASE CONFIG
         const SUPABASE_URL = 'https://qdfvqllzugsiqpklqccl.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZnZxbGx6dWdzaXFwa2xxY2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczOTc5MDksImV4cCI6MjA1Mjk3MzkwOX0.z_hxdvV8dPU9ZO2eGWpigJQ36wJCKFUYOJDPpnqwkI0';
-
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let cart = [];
         let allProducts = [];
+        let filteredProducts = [];
 
         // Load Products
         async function loadProducts() {
@@ -109,47 +177,50 @@
                     .from('products')
                     .select('*')
                     .eq('is_available', true)
-                    .order('id', { ascending: true });
+                    .order('category', { ascending: true });
 
                 if (error) throw error;
-
                 allProducts = data || [];
-                displayProducts(allProducts);
+                filteredProducts = allProducts;
+                displayProducts(filteredProducts);
             } catch (error) {
-                console.error('Ürünler yüklenemedi:', error);
+                console.error('Error:', error);
                 document.getElementById('productsGrid').innerHTML = 
-                    '<div class="col-span-full text-center text-red-600 p-8">Ürünler yüklenemedi. Lütfen sayfayı yenileyin.</div>';
+                    '<div class="col-span-full text-center text-red-600 p-8">Ürünler yüklenemedi</div>';
             }
         }
 
         // Display Products
         function displayProducts(products) {
             const grid = document.getElementById('productsGrid');
+            const countEl = document.getElementById('productCount');
             
+            countEl.textContent = products.length;
+
             if (products.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-gray-500 p-8">Ürün bulunamadı.</div>';
+                grid.innerHTML = '<div class="col-span-full text-center text-gray-500 p-8">Ürün bulunamadı</div>';
                 return;
             }
 
             grid.innerHTML = products.map(product => `
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
-                    <div class="aspect-square bg-gray-100 overflow-hidden">
+                <div class="product-card bg-white rounded-lg shadow hover:shadow-lg overflow-hidden">
+                    <div class="relative aspect-square bg-gray-50">
                         <img 
                             src="${product.image_url}" 
                             alt="${product.name}"
-                            class="w-full h-full object-cover hover:scale-110 transition duration-300"
-                            onerror="this.src='https://via.placeholder.com/300x300?text=Ürün+Görseli'"
+                            class="w-full h-full object-contain p-2"
+                            onerror="this.src='https://via.placeholder.com/300x300?text=Ürün'"
                         >
                     </div>
                     <div class="p-3">
-                        <p class="text-xs text-green-600 font-medium mb-1">${product.category}</p>
-                        <h3 class="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 h-10">${product.name}</h3>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-lg font-bold text-green-600">${product.price.toFixed(2)} ₺</span>
+                        <p class="text-xs text-gray-500 mb-1">${product.category}</p>
+                        <h3 class="text-sm font-medium text-gray-800 mb-2 h-10 line-clamp-2">${product.name}</h3>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-lg font-bold text-orange-600">${product.price.toFixed(2)} ₺</span>
                         </div>
                         <button 
                             onclick="addToCart(${product.id})"
-                            class="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">
+                            class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded text-sm font-medium transition">
                             Sepete Ekle
                         </button>
                     </div>
@@ -159,19 +230,29 @@
 
         // Filter by Category
         function filterCategory(category) {
-            const buttons = document.querySelectorAll('.category-btn');
+            const buttons = document.querySelectorAll('.category-link');
             buttons.forEach(btn => {
-                btn.classList.remove('bg-green-600', 'text-white');
-                btn.classList.add('bg-gray-200');
+                btn.classList.remove('bg-orange-50', 'text-orange-600', 'font-semibold');
             });
-            event.target.classList.add('bg-green-600', 'text-white');
-            event.target.classList.remove('bg-gray-200');
-
+            
             if (category === 'all') {
-                displayProducts(allProducts);
+                filteredProducts = allProducts;
             } else {
-                const filtered = allProducts.filter(p => p.category.includes(category));
-                displayProducts(filtered);
+                filteredProducts = allProducts.filter(p => p.category.includes(category));
+            }
+            displayProducts(filteredProducts);
+        }
+
+        // Search Products
+        function searchProducts(query) {
+            const searchTerm = query.toLowerCase().trim();
+            if (searchTerm === '') {
+                displayProducts(filteredProducts);
+            } else {
+                const results = filteredProducts.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm)
+                );
+                displayProducts(results);
             }
         }
 
@@ -186,9 +267,8 @@
             } else {
                 cart.push({ ...product, quantity: 1 });
             }
-
             updateCart();
-            showNotification('Ürün sepete eklendi!');
+            showNotification('Ürün sepete eklendi');
         }
 
         // Update Cart
@@ -197,7 +277,8 @@
             const cartCount = document.getElementById('cartCount');
             const cartTotal = document.getElementById('cartTotal');
 
-            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
 
             if (cart.length === 0) {
                 cartItemsDiv.innerHTML = '<div class="text-center text-gray-500 py-8">Sepetiniz boş</div>';
@@ -209,16 +290,16 @@
             cartTotal.textContent = total.toFixed(2) + ' ₺';
 
             cartItemsDiv.innerHTML = cart.map(item => `
-                <div class="flex items-center gap-3 mb-4 pb-4 border-b">
-                    <img src="${item.image_url}" alt="${item.name}" class="w-16 h-16 object-cover rounded" onerror="this.src='https://via.placeholder.com/64'">
+                <div class="flex gap-3 mb-4 pb-4 border-b">
+                    <img src="${item.image_url}" alt="${item.name}" class="w-20 h-20 object-contain bg-gray-50 rounded" onerror="this.src='https://via.placeholder.com/80'">
                     <div class="flex-1">
-                        <p class="text-sm font-semibold text-gray-800 line-clamp-2">${item.name}</p>
-                        <p class="text-xs text-green-600">${item.price.toFixed(2)} ₺</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="changeQuantity(${item.id}, -1)" class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">-</button>
-                        <span class="w-8 text-center font-semibold">${item.quantity}</span>
-                        <button onclick="changeQuantity(${item.id}, 1)" class="w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center hover:bg-green-700">+</button>
+                        <p class="text-sm font-medium mb-1">${item.name}</p>
+                        <p class="text-orange-600 font-semibold">${item.price.toFixed(2)} ₺</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <button onclick="changeQuantity(${item.id}, -1)" class="w-7 h-7 bg-gray-200 rounded hover:bg-gray-300">-</button>
+                            <span class="w-8 text-center font-semibold">${item.quantity}</span>
+                            <button onclick="changeQuantity(${item.id}, 1)" class="w-7 h-7 bg-orange-500 text-white rounded hover:bg-orange-600">+</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -228,28 +309,25 @@
         function changeQuantity(productId, change) {
             const item = cart.find(i => i.id === productId);
             if (!item) return;
-
             item.quantity += change;
             if (item.quantity <= 0) {
                 cart = cart.filter(i => i.id !== productId);
             }
-
             updateCart();
         }
 
         // Toggle Cart
         function toggleCart() {
-            const sidebar = document.getElementById('cartSidebar');
-            sidebar.classList.toggle('translate-x-full');
+            document.getElementById('cartSidebar').classList.toggle('translate-x-full');
         }
 
         // Show Notification
         function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-20 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 2000);
+            const notif = document.createElement('div');
+            notif.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2000);
         }
 
         // Initialize
