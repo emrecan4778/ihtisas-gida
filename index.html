@@ -1,125 +1,383 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>İhtisas Gıda</title>
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-:root{
-  --red:#c4161c;
-  --dark:#1f2937;
-  --gray:#f3f4f6;
-}
-body{background:#fff;font-family:system-ui;}
-.app{max-width:420px;margin:auto;background:#fff;min-height:100vh;}
-.card{border:1px solid #e5e7eb}
-.bottom-nav button.active{color:var(--red);font-weight:800}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İhtisas Gıda - B2B Toptan Market</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+<body class="bg-gray-50">
 
-<body>
-<div class="app">
-
-<!-- HEADER -->
-<header class="bg-white border-b sticky top-0 z-50">
-  <div class="flex items-center justify-between px-4 py-3">
-    <div class="text-xl font-extrabold text-[var(--red)]">İHTİSAS</div>
-    <div class="relative">
-      🛒
-      <span class="absolute -top-1 -right-2 bg-yellow-400 text-xs px-1 rounded-full">2</span>
-    </div>
-  </div>
-
-  <!-- SEARCH -->
-  <div class="px-4 pb-3">
-    <input class="w-full border rounded-lg px-4 py-2 text-sm bg-gray-100"
-      placeholder="Ürün veya kategori ara">
-  </div>
-</header>
-
-<!-- BANNER -->
-<section class="bg-[var(--red)] text-white px-4 py-5">
-  <div class="text-xs font-semibold opacity-90">EV DIŞI TÜKETİM</div>
-  <div class="text-2xl font-extrabold leading-tight mt-1">
-    18 L YAĞ • KOLİ ÜRÜN <br> TOPTAN MARKET
-  </div>
-  <div class="flex gap-2 mt-3">
-    <span class="bg-white/20 px-3 py-1 text-xs rounded">HORECA</span>
-    <span class="bg-white/20 px-3 py-1 text-xs rounded">TOPLU ALIM</span>
-  </div>
-</section>
-
-<!-- CATEGORIES -->
-<section class="px-4 py-4 border-b">
-  <div class="flex gap-2 overflow-x-auto">
-    <button class="bg-[var(--red)] text-white px-4 py-2 text-sm rounded">Yağlar</button>
-    <button class="border px-4 py-2 text-sm rounded">Bakliyat</button>
-    <button class="border px-4 py-2 text-sm rounded">Soslar</button>
-    <button class="border px-4 py-2 text-sm rounded">Temel Gıda</button>
-    <button class="border px-4 py-2 text-sm rounded">Temizlik</button>
-  </div>
-</section>
-
-<!-- BEST SELLERS -->
-<section class="px-4 py-4">
-  <h2 class="font-extrabold text-lg mb-3">Çok Satanlar</h2>
-
-  <div class="flex gap-3 overflow-x-auto">
-    <div class="card p-3 min-w-[160px]">
-      <div class="h-20 bg-gray-100 mb-2 flex items-center justify-center text-xs">KOLİ</div>
-      <div class="font-bold text-sm">Ayçiçek Yağı</div>
-      <div class="text-xs text-gray-500">18 L Teneke</div>
-      <div class="text-[var(--red)] font-extrabold mt-1">₺1.650</div>
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold mb-6 text-center text-blue-700">Giriş Yap</h2>
+            <div id="loginForm">
+                <input type="email" id="loginEmail" placeholder="E-posta" class="w-full px-4 py-2 border rounded-lg mb-3 focus:outline-none focus:border-blue-500">
+                <input type="password" id="loginPassword" placeholder="Şifre" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:border-blue-500">
+                <button onclick="handleLogin()" class="w-full bg-blue-700 text-white py-3 rounded-lg font-bold hover:bg-blue-800 mb-3">Giriş Yap</button>
+                <button onclick="showRegister()" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300">Hesap Oluştur</button>
+            </div>
+            <div id="registerForm" class="hidden">
+                <input type="text" id="registerName" placeholder="Ad Soyad" class="w-full px-4 py-2 border rounded-lg mb-3 focus:outline-none focus:border-blue-500">
+                <input type="email" id="registerEmail" placeholder="E-posta" class="w-full px-4 py-2 border rounded-lg mb-3 focus:outline-none focus:border-blue-500">
+                <input type="password" id="registerPassword" placeholder="Şifre (min 6 karakter)" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:border-blue-500">
+                <button onclick="handleRegister()" class="w-full bg-blue-700 text-white py-3 rounded-lg font-bold hover:bg-blue-800 mb-3">Kayıt Ol</button>
+                <button onclick="showLogin()" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300">Giriş Yap</button>
+            </div>
+            <p id="authMessage" class="text-center text-sm mt-4"></p>
+        </div>
     </div>
 
-    <div class="card p-3 min-w-[160px]">
-      <div class="h-20 bg-gray-100 mb-2 flex items-center justify-center text-xs">KOLİ</div>
-      <div class="font-bold text-sm">Pirinç Osmancık</div>
-      <div class="text-xs text-gray-500">25 Kg</div>
-      <div class="text-[var(--red)] font-extrabold mt-1">₺2.350</div>
+    <!-- Header -->
+    <header class="bg-blue-700 text-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="bg-white text-blue-700 px-4 py-2 rounded-lg font-bold text-xl">
+                        İHTİSAS GIDA
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCart()" class="relative bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3z"/>
+                        </svg>
+                        <span>Sepetim</span>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-yellow-400 text-blue-900 text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">0</span>
+                    </button>
+                    <button onclick="handleLogout()" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100">
+                        Çıkış
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="bg-white border-b py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="Ürün ara..." 
+                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    oninput="searchProducts(this.value)"
+                >
+                <button class="bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700">Ara</button>
+            </div>
+        </div>
     </div>
-  </div>
-</section>
 
-<!-- PRODUCTS -->
-<section class="px-4 pb-24">
-  <h2 class="font-extrabold text-lg mb-3">Tüm Ürünler</h2>
-
-  <div class="grid grid-cols-2 gap-3">
-    <div class="card p-3">
-      <div class="h-24 bg-gray-100 mb-2"></div>
-      <div class="font-bold text-sm">Mısır Yağı</div>
-      <div class="text-xs text-gray-500">18 L</div>
-      <div class="flex justify-between items-center mt-1">
-        <span class="text-[var(--red)] font-extrabold">₺1.720</span>
-        <button class="bg-[var(--red)] text-white text-xs px-2 py-1 rounded">Ekle</button>
-      </div>
+    <!-- Quick Categories -->
+    <div class="bg-white border-b">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex gap-3 overflow-x-auto">
+                <button onclick="filterCategory('all')" class="cat-btn px-4 py-2 bg-red-600 text-white rounded-full whitespace-nowrap font-semibold">Çok Satanlar</button>
+                <button onclick="filterCategory('Kahvaltılık')" class="cat-btn px-4 py-2 bg-gray-200 rounded-full whitespace-nowrap hover:bg-gray-300">Kahvaltılık</button>
+                <button onclick="filterCategory('Temel Gıda - Bakliyat')" class="cat-btn px-4 py-2 bg-gray-200 rounded-full whitespace-nowrap hover:bg-gray-300">Bakliyat</button>
+                <button onclick="filterCategory('Temel Gıda - Yağ')" class="cat-btn px-4 py-2 bg-gray-200 rounded-full whitespace-nowrap hover:bg-gray-300">Yağlar</button>
+                <button onclick="filterCategory('Temel Gıda - Salça')" class="cat-btn px-4 py-2 bg-gray-200 rounded-full whitespace-nowrap hover:bg-gray-300">Salça</button>
+                <button onclick="filterCategory('Temel Gıda - Konserve')" class="cat-btn px-4 py-2 bg-gray-200 rounded-full whitespace-nowrap hover:bg-gray-300">Konserve</button>
+            </div>
+        </div>
     </div>
 
-    <div class="card p-3">
-      <div class="h-24 bg-gray-100 mb-2"></div>
-      <div class="font-bold text-sm">Domates Salça</div>
-      <div class="text-xs text-gray-500">5 Kg</div>
-      <div class="flex justify-between items-center mt-1">
-        <span class="text-[var(--red)] font-extrabold">₺295</span>
-        <button class="bg-[var(--red)] text-white text-xs px-2 py-1 rounded">Ekle</button>
-      </div>
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex gap-6">
+            
+            <!-- Sidebar Categories (Desktop) -->
+            <aside class="hidden lg:block w-64 bg-white rounded-lg shadow p-4 h-fit sticky top-24">
+                <h3 class="font-bold text-lg mb-4 text-blue-700">Kategoriler</h3>
+                <ul class="space-y-2">
+                    <li><button onclick="filterCategory('all')" class="w-full text-left px-3 py-2 hover:bg-blue-50 rounded">Tüm Ürünler</button></li>
+                    <li><button onclick="filterCategory('Kahvaltılık')" class="w-full text-left px-3 py-2 hover:bg-blue-50 rounded">Kahvaltılık</button></li>
+                    <li><button onclick="filterCategory('Temel Gıda - Bakliyat')" class="w-full text-left px-3 py-2 hover:bg-blue-50 rounded">Bakliyat</button></li>
+                    <li><button onclick="filterCategory('Temel Gıda - Yağ')" class="w-full text-left px-3 py-2 hover:bg-blue-50 rounded">Yağlar</button></li>
+                    <li><button onclick="filterCategory('Temel Gıda - Salça')" class="w-full text-left px-3 py-2 hover:bg-blue-50 rounded">Salça</button></li>
+                    <li><button onclick="filterCategory('Temel Gıda - Konserve')" class="w-full text-left px-3 py-2 hover:bg-blue-50 rounded">Konserve</button></li>
+                </ul>
+            </aside>
+
+            <!-- Products -->
+            <div class="flex-1">
+                <p class="text-gray-600 mb-4"><span id="productCount">0</span> ürün listeleniyor</p>
+                <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <!-- Products here -->
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</section>
 
-<!-- BOTTOM NAV -->
-<nav class="fixed bottom-0 left-0 right-0 bg-white border-t">
-  <div class="app grid grid-cols-4 text-xs">
-    <button class="py-3 active">🏠<br>Anasayfa</button>
-    <button class="py-3">📂<br>Kategori</button>
-    <button class="py-3">🛒<br>Sepet</button>
-    <button class="py-3">👤<br>Profil</button>
-  </div>
-</nav>
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex flex-col h-full">
+            <div class="bg-blue-700 text-white p-4 flex items-center justify-between">
+                <h2 class="text-xl font-bold">Sepetim</h2>
+                <button onclick="toggleCart()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="cartItems" class="flex-1 overflow-y-auto p-4">
+                <p class="text-center text-gray-500 py-8">Sepetiniz boş</p>
+            </div>
+            <div class="border-t p-4 bg-gray-50">
+                <div class="mb-4">
+                    <div class="flex justify-between mb-2">
+                        <span>Ara Toplam:</span>
+                        <span id="cartSubtotal">0.00 ₺</span>
+                    </div>
+                    <div class="flex justify-between mb-2 text-sm text-gray-600">
+                        <span>KDV:</span>
+                        <span id="cartTax">0.00 ₺</span>
+                    </div>
+                    <div class="flex justify-between text-xl font-bold text-blue-700">
+                        <span>Toplam:</span>
+                        <span id="cartTotal">0.00 ₺</span>
+                    </div>
+                </div>
+                <button onclick="completeOrder()" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700">
+                    Siparişi Tamamla
+                </button>
+            </div>
+        </div>
+    </div>
 
-</div>
+    <script>
+        const SUPABASE_URL = 'https://qdfvqllzugsiqpklqccl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZnZxbGx6dWdzaXFwa2xxY2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczOTc5MDksImV4cCI6MjA1Mjk3MzkwOX0.z_hxdvV8dPU9ZO2eGWpigJQ36wJCKFUYOJDPpnqwkI0';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let cart = [];
+        let allProducts = [];
+        let filteredProducts = [];
+
+        // Check session
+        async function checkAuth() {
+            const { data } = await supabase.auth.getSession();
+            if (data.session) {
+                currentUser = data.session.user;
+                document.getElementById('loginModal').classList.add('hidden');
+                loadProducts();
+            }
+        }
+
+        // Login
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                document.getElementById('authMessage').textContent = 'Giriş başarısız: ' + error.message;
+                document.getElementById('authMessage').className = 'text-center text-sm mt-4 text-red-600';
+            } else {
+                currentUser = data.user;
+                document.getElementById('loginModal').classList.add('hidden');
+                loadProducts();
+            }
+        }
+
+        // Register
+        async function handleRegister() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value;
+            
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: { data: { full_name: name } }
+            });
+            
+            if (error) {
+                document.getElementById('authMessage').textContent = 'Kayıt başarısız: ' + error.message;
+                document.getElementById('authMessage').className = 'text-center text-sm mt-4 text-red-600';
+            } else {
+                document.getElementById('authMessage').textContent = 'Kayıt başarılı! Giriş yapabilirsiniz.';
+                document.getElementById('authMessage').className = 'text-center text-sm mt-4 text-green-600';
+                setTimeout(showLogin, 2000);
+            }
+        }
+
+        // Logout
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            location.reload();
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        // Load Products
+        async function loadProducts() {
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .eq('is_available', true)
+                .order('category');
+
+            if (!error && data) {
+                allProducts = data;
+                filteredProducts = data;
+                displayProducts(data);
+            }
+        }
+
+        // Display Products
+        function displayProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            document.getElementById('productCount').textContent = products.length;
+
+            if (products.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">Ürün bulunamadı</p>';
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="bg-white rounded-lg shadow hover:shadow-lg transition">
+                    <div class="aspect-square bg-gray-50 p-3">
+                        <img src="${p.image_url}" alt="${p.name}" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/300?text=Ürün'">
+                    </div>
+                    <div class="p-3">
+                        <p class="text-xs text-gray-500 mb-1">${p.category}</p>
+                        <h3 class="text-sm font-semibold mb-2 h-10 line-clamp-2">${p.name}</h3>
+                        <p class="text-xl font-bold text-blue-700 mb-3">${p.price.toFixed(2)} ₺</p>
+                        <button onclick="addToCart(${p.id})" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 font-semibold">
+                            Sepete Ekle
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter
+        function filterCategory(cat) {
+            filteredProducts = cat === 'all' ? allProducts : allProducts.filter(p => p.category.includes(cat));
+            displayProducts(filteredProducts);
+        }
+
+        // Search
+        function searchProducts(query) {
+            const q = query.toLowerCase();
+            const results = filteredProducts.filter(p => p.name.toLowerCase().includes(q));
+            displayProducts(results);
+        }
+
+        // Add to Cart
+        function addToCart(id) {
+            const product = allProducts.find(p => p.id === id);
+            const existing = cart.find(c => c.id === id);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCart();
+            showNotif('Ürün sepete eklendi');
+        }
+
+        // Update Cart
+        function updateCart() {
+            const count = cart.reduce((s, i) => s + i.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+
+            const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+            const tax = subtotal * 0.10;
+            const total = subtotal + tax;
+
+            document.getElementById('cartSubtotal').textContent = subtotal.toFixed(2) + ' ₺';
+            document.getElementById('cartTax').textContent = tax.toFixed(2) + ' ₺';
+            document.getElementById('cartTotal').textContent = total.toFixed(2) + ' ₺';
+
+            const cartDiv = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartDiv.innerHTML = '<p class="text-center text-gray-500 py-8">Sepetiniz boş</p>';
+                return;
+            }
+
+            cartDiv.innerHTML = cart.map(item => `
+                <div class="flex gap-3 mb-4 pb-4 border-b">
+                    <img src="${item.image_url}" alt="${item.name}" class="w-20 h-20 object-contain bg-gray-50 rounded">
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold mb-1">${item.name}</p>
+                        <p class="text-blue-700 font-bold">${item.price.toFixed(2)} ₺</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-7 h-7 bg-gray-200 rounded hover:bg-gray-300">-</button>
+                            <span class="w-8 text-center font-bold">${item.quantity}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-7 h-7 bg-blue-600 text-white rounded hover:bg-blue-700">+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeQty(id, change) {
+            const item = cart.find(c => c.id === id);
+            item.quantity += change;
+            if (item.quantity <= 0) cart = cart.filter(c => c.id !== id);
+            updateCart();
+        }
+
+        function toggleCart() {
+            document.getElementById('cartSidebar').classList.toggle('translate-x-full');
+        }
+
+        // Complete Order
+        async function completeOrder() {
+            if (cart.length === 0) return;
+
+            const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0) * 1.10;
+
+            const { data: order, error: orderError } = await supabase
+                .from('orders')
+                .insert({ user_id: currentUser.id, total_amount: total })
+                .select()
+                .single();
+
+            if (orderError) {
+                alert('Sipariş oluşturulamadı');
+                return;
+            }
+
+            const items = cart.map(c => ({
+                order_id: order.id,
+                product_id: c.id,
+                quantity: c.quantity,
+                price: c.price
+            }));
+
+            await supabase.from('order_items').insert(items);
+
+            alert('Siparişiniz alındı! Sipariş No: ' + order.id);
+            cart = [];
+            updateCart();
+            toggleCart();
+        }
+
+        function showNotif(msg) {
+            const div = document.createElement('div');
+            div.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 2000);
+        }
+
+        checkAuth();
+    </script>
 </body>
 </html>
